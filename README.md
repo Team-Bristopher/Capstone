@@ -1,3 +1,3 @@
 # Capstone
 
-When a project is setup, I will put information to start & stop the application.
+All of the start & stop information is located in the subfolders, along with each's code.
