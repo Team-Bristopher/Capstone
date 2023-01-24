@@ -1,6 +1,7 @@
 import { Card, CardBody, CardHeader, Heading, Skeleton, Text, Container } from "@chakra-ui/react";
 import { FunctionComponent, useEffect, useState } from "react";
 import { HealthcheckMessage } from "../models/incoming/HealthcheckMessage";
+import { getApiStatus } from "../api/api-calls";
 import { Page } from "../page/page";
 
 export const Settings: FunctionComponent = () => {
@@ -10,20 +11,11 @@ export const Settings: FunctionComponent = () => {
     useEffect(() => {
         setIsLoadingApiStatus(true);
         
-        fetch(`${process.env.REACT_APP_API_URL}/api/main/healthcheck`, {
-            method: "GET"
-        })
-        .then((res) => res.json())
-        .then((responseJson: HealthcheckMessage) => {
-            setIsLoadingApiStatus(false);
-            
-            setApiStatus(responseJson.health);
-        })
-        .catch(() => {
-            setIsLoadingApiStatus(false);
-
-            setApiStatus("Error");
-        })
+        getApiStatus()
+            .then((response: HealthcheckMessage | undefined) => {
+                setApiStatus(response == undefined ? "Error" : response.health);
+                setIsLoadingApiStatus(false);
+            });
     }, []);
     
     return (
