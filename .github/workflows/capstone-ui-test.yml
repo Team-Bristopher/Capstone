@@ -1,14 +1,20 @@
-name: capstone-ui
+name: capstone-ui-test
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+    paths: 
+      - frontend/capstone-ui/**
+      - .github/workflows/capstone-ui-test.yml
 
 jobs:
-  build:
+  ts:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/capstone-ui
     strategy:
       matrix:
         node-version: [18.x]
@@ -20,10 +26,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-      working-directory: frontend/capstone-ui
     - run: npm ci
-      working-directory: frontend/capstone-ui
     - run: npm run build --if-present
-      working-directory: frontend/capstone-ui
     - run: npm test
-      working-directory: frontend/capstone-ui
