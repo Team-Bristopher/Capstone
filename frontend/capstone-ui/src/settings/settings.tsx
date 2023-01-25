@@ -13,7 +13,7 @@ export const Settings: FunctionComponent = () => {
         
         getApiStatus()
             .then((response: HealthcheckMessage | undefined) => {
-                setApiStatus(response == undefined ? "Error" : response.health);
+                setApiStatus(response === undefined ? "Error" : response.health);
                 setIsLoadingApiStatus(false);
             });
     }, []);
