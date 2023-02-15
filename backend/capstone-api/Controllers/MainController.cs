@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using capstone_api.Models.OutgoingMessages;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace capstone_api.Controllers
 {
@@ -21,9 +23,10 @@ namespace capstone_api.Controllers
         /// </summary>
         /// <returns>Status "Operational" if the API is online.</returns>
         [HttpGet("healthcheck")]
+		[Authorize(Policy = "RegisteredUser")]
 		public IActionResult GetHealthcheck()
 		{
-			return Ok(new HealthcheckMessage("Operational"));
+            return Ok(new HealthcheckMessage("Operational"));
 		}
 	}
 }

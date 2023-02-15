@@ -16,8 +16,6 @@ namespace capstone_api
         /// </summary>
         private static readonly string _schema = "Capstone";
 
-        public DatabaseContext() { }
-
         /// <summary>
         /// The Fundraisers database context.
         /// </summary>
@@ -47,6 +45,14 @@ namespace capstone_api
         /// The GlobalAdmins database context.
         /// </summary>
         public DbSet<GlobalAdmin> GlobalAdmins { get; set; }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public DatabaseContext(DbContextOptions<DatabaseContext> options)
+            : base(options)
+        {
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -1,3 +1,3 @@
 export interface HealthcheckMessage {
-    health: string;
+  health: string;
 }

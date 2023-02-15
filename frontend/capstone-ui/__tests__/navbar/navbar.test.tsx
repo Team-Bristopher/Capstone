@@ -1,9 +1,9 @@
-import React from 'react';
-import { render } from '@testing-library/react';
+import { render } from "@testing-library/react";
+import React from "react";
+import { BrowserRouter } from "react-router-dom";
 import { Navbar } from "../../src/navbar/navbar";
-import { BrowserRouter } from 'react-router-dom';
 
-it('renders navbar', () => {
+it("renders navbar", () => {
   const navbar = render(
     <BrowserRouter>
       <Navbar />
@@ -14,5 +14,5 @@ it('renders navbar', () => {
   expect(navbar.container.childNodes.length).toBeGreaterThan(0);
 
   // Settings button existence.
-  expect(navbar.getByLabelText("Settings menu")).toBeTruthy();
+  expect(navbar.getByLabelText("Settings")).toBeTruthy();
 });
