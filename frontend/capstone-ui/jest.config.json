@@ -1,8 +1,8 @@
 {
-    "bail": 1,
-    "verbose": true,
-    "preset": "ts-jest",
-    "testEnvironment": "jsdom",
-    "collectCoverage": true,
-    "coverageReporters": ["json", "html"]
+  "bail": 1,
+  "verbose": true,
+  "preset": "ts-jest",
+  "testEnvironment": "jsdom",
+  "collectCoverage": true,
+  "coverageReporters": ["json", "html"]
 }

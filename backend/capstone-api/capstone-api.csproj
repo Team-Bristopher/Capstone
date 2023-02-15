@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
     <PackageReference Include="StyleCop" Version="6.2.0" />
     <PackageReference Include="Npgsql" Version="7.0.1" />
@@ -17,6 +17,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.13" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.26.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.26.1" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,8 +30,24 @@
     <None Remove="Npgsql" />
     <None Remove="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <None Remove="Microsoft.EntityFrameworkCore.Design" />
+    <None Remove="System.IdentityModel.Tokens.Jwt" />
+    <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <None Remove="BusinessLogic\" />
+    <None Remove="IncomingMessages\" />
+    <None Remove="DataAccessLayer\" />
+    <None Remove="Exceptions\" />
+    <None Remove="Filters\" />
+    <None Remove="Microsoft.IdentityModel.Tokens" />
+    <None Remove="Models\Constants\" />
+    <None Remove="BCrypt.Net-Next" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\DatabaseEntities\" />
+    <Folder Include="BusinessLogic\" />
+    <Folder Include="IncomingMessages\" />
+    <Folder Include="DataAccessLayer\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Filters\" />
+    <Folder Include="Models\Constants\" />
   </ItemGroup>
 </Project>

@@ -1,9 +1,9 @@
-import React from 'react';
-import { render } from '@testing-library/react';
+import React from "react";
+import { render } from "@testing-library/react";
 import { Navbar } from "../../src/navbar/navbar";
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from "react-router-dom";
 
-it('renders navbar', () => {
+it("renders navbar", () => {
   const navbar = render(
     <BrowserRouter>
       <Navbar />
