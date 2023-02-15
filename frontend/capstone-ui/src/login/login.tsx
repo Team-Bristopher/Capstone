@@ -27,7 +27,7 @@ export const Login: FunctionComponent = () => {
 
    const [isLoadingOpen, setIsLoadingOpen] = useState<boolean>(false);
 
-   const { register, getValues, formState, handleSubmit, setError } = useForm<LoginPageForm>({
+   const { register, getValues, formState, handleSubmit } = useForm<LoginPageForm>({
       criteriaMode: "all",
       reValidateMode: "onSubmit",
    });
@@ -56,7 +56,7 @@ export const Login: FunctionComponent = () => {
          isClosable: false,
       });
 
-      if (response.responseType == "success") {
+      if (response.responseType === "success") {
          window.localStorage.setItem("accessToken", response.accessToken);
 
          navigate("/");
@@ -77,6 +77,8 @@ export const Login: FunctionComponent = () => {
       setIsLoadingOpen(true);
 
       sendLoginUserRequest();
+
+      // eslint-disable-next-line
    }, [formState.isSubmitting]);
 
    return (

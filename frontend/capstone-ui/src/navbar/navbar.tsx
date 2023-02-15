@@ -27,6 +27,7 @@ export const Navbar: FunctionComponent = () => {
           src="/rome_logo.png"
           width="123px"
           height="123px"
+          alt="Project ROME Logo"
           style={{
             "position": "absolute"
           }}

@@ -19,7 +19,7 @@ export const AuthContextProvider = (props: AuthContextProps) => {
    const sendGetUserDataRequest = async () => {
       const response = await getUserData();
 
-      if (response.responseType == "success") {
+      if (response.responseType === "success") {
          authContext.current = {
             loggedInUser: response.myUser,
          };

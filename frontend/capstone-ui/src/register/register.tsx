@@ -71,7 +71,7 @@ export const RegisterPage: FunctionComponent = () => {
 
       setIsLoadingOpen(false);
 
-      if (response.responseType == "success") {
+      if (response.responseType === "success") {
          navigate("/login");
       }
    }
@@ -101,6 +101,7 @@ export const RegisterPage: FunctionComponent = () => {
 
       sendRegisterRequest();
 
+      // eslint-disable-next-line
    }, [formState.isSubmitting]);
 
    return (

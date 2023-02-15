@@ -16,7 +16,7 @@ export const LoadingDialog: FunctionComponent<LoadingDialogProps> = (props: Load
       } else {
          onClose();
       }
-   }, [props.open]);
+   }, [props.open, onClose, onOpen]);
 
    return (
       <>
