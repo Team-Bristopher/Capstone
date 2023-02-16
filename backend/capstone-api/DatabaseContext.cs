@@ -9,7 +9,7 @@ namespace capstone_api
         /// <summary>
         /// The database connection string.
         /// </summary>
-        private static readonly string _databaseConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=capstone";
+        private static readonly string _databaseConnectionString = "User ID=capstone;Password=capstone123;Host=localhost;Port=5432;Database=capstone";
 
         /// <summary>
         /// The name of the database schema.
