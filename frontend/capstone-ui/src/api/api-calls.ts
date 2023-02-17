@@ -1,7 +1,9 @@
+import { EditUserMessageResponse } from "../models/incoming/EditUserMessageResponse";
 import { HealthcheckMessage } from "../models/incoming/HealthcheckResponse";
 import { LoggedInUserResponse } from "../models/incoming/LoggedInUserResponse";
 import { MyUserResponse } from "../models/incoming/MyUserResponse";
 import { RegisterUserResponse } from "../models/incoming/RegisterUserResponse";
+import { EditUserMessage } from "../models/outgoing/EditUserMessage";
 import { LoginUserMessage } from "../models/outgoing/LoginUserMessage";
 import { RegisterUserMessage } from "../models/outgoing/RegisterUserMessage";
 
@@ -123,4 +125,31 @@ export const getUserData = (): Promise<MyUserResponse> => {
           } as MyUserResponse
       }
     })
+}
+
+export const editUserData = (message: EditUserMessage): Promise<EditUserMessageResponse> => {
+  const authorization = localStorage.getItem("accessToken");
+
+  return fetch(`${process.env.REACT_APP_API_URL}/api/user/edit`, {
+    headers: {
+      "Authorization": "Bearer " + (authorization || ""),
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(message),
+  })
+    .then((resp) => {
+      switch (resp.status) {
+        case 200:
+          return {
+            responseType: "success",
+            message: "Edited profile sucessfully",
+          } as EditUserMessageResponse
+        default:
+          return {
+            responseType: "error",
+            message: "An unknown error has occured",
+          } as EditUserMessageResponse
+      }
+    });
 }

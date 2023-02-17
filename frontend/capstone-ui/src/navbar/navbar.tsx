@@ -1,4 +1,4 @@
-import { Box, Container, Link, Text } from "@chakra-ui/react";
+import { Box, Button as ChakraButton, Container, Link, Popover, PopoverContent, PopoverTrigger, Text } from "@chakra-ui/react";
 import { FunctionComponent, useContext } from "react";
 import { MdSettings } from "react-icons/md";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
@@ -9,6 +9,14 @@ export const Navbar: FunctionComponent = () => {
   const navigate = useNavigate();
 
   const authContext = useContext(AuthContext);
+
+  const signOut = () => {
+    window.localStorage.setItem("accessToken", "");
+
+    navigate("/login");
+
+    window.location.reload();
+  }
 
   return (
     <>
@@ -85,6 +93,7 @@ export const Navbar: FunctionComponent = () => {
             display="flex"
             flexDir="row"
             alignItems="top"
+            height="2em"
           >
             {authContext.loggedInUser === undefined &&
               <Link as={ReactRouterLink} to="/login">
@@ -117,17 +126,48 @@ export const Navbar: FunctionComponent = () => {
                 </Container>
               )
             }
-
-            <Link as={ReactRouterLink} to="/settings">
-              <Button
-                variant="icon_button"
-                ariaLabel="Settings"
-                icon={MdSettings}
-                style={{
-                  width: "1em",
-                }}
-              />
-            </Link>
+            <Popover
+              placement="bottom"
+            >
+              <PopoverTrigger>
+                <div>
+                  <Button
+                    variant="icon_button"
+                    ariaLabel="Settings"
+                    icon={MdSettings}
+                    style={{
+                      width: "1em",
+                    }}
+                  />
+                </div>
+              </PopoverTrigger>
+              <PopoverContent
+                zIndex="1000"
+                padding="1em"
+                minWidth="1em"
+                width="10em"
+              >
+                <ChakraButton
+                  padding="0.5rem"
+                  margin="0"
+                  width="100%"
+                  height="3rem"
+                  onClick={() => { navigate("/settings"); }}
+                >
+                  Profile
+                </ChakraButton>
+                <ChakraButton
+                  padding="0.5rem"
+                  margin="0"
+                  width="100%"
+                  height="3rem"
+                  marginTop="1em"
+                  onClick={signOut}
+                >
+                  Sign Out
+                </ChakraButton>
+              </PopoverContent>
+            </Popover>
           </Box>
         </Container>
       </Container>
