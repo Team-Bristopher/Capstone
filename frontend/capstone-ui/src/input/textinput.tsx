@@ -1,4 +1,4 @@
-import { Box, Icon, Input, Popover, PopoverBody, PopoverContent, PopoverTrigger, Text } from "@chakra-ui/react";
+import { Box, Icon, Input, Popover, PopoverBody, PopoverContent, PopoverTrigger, StyleProps, Text } from "@chakra-ui/react";
 import React, { FunctionComponent } from "react";
 import { RegisterOptions, UseFormRegister } from "react-hook-form";
 import { BiError } from "react-icons/bi";
@@ -19,6 +19,8 @@ interface TextInputProps {
    ariaLabel: string;
    formInfo?: FormRegisterInfo;
    hideText?: boolean;
+   style?: StyleProps;
+   containerStyle?: StyleProps;
 }
 
 export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputProps) => {
@@ -47,6 +49,7 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
             flexDir="row"
             alignItems="center"
             aria-label={props.ariaLabel}
+            {...props.containerStyle}
          >
             {props.variant === "icon_only" &&
                <Icon
@@ -79,6 +82,7 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                onChange={onInputChanged}
                type={props.hideText ? "password" : undefined}
                {...props.formInfo?.registerFn(props.formInfo?.name || '', props.formInfo?.registerOptions)}
+               {...props.style}
             />
             {hasError() &&
                <Popover placement="top" trigger="hover">

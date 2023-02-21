@@ -1,70 +1,153 @@
-import {
-  Card,
-  CardBody,
-  CardHeader, Container, Heading,
-  Skeleton,
-  Text
-} from "@chakra-ui/react";
-import { FunctionComponent, useEffect, useState } from "react";
+import { Avatar, Container, Text } from "@chakra-ui/react";
+import { FunctionComponent, useContext } from "react";
+import { HiOutlinePencil } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
-import { getApiStatus } from "../api/api-calls";
+import { AuthContext } from "../globals/auth_context";
 import { Button } from "../input/button";
-import { HealthcheckMessage } from "../models/incoming/HealthcheckResponse";
 import { Page } from "../page/page";
 
 export const Settings: FunctionComponent = () => {
+  const authContext = useContext(AuthContext);
+
   const navigate = useNavigate();
-  const [isLoadingApiStatus, setIsLoadingApiStatus] = useState<boolean>(true);
-  const [apiStatus, setApiStatus] = useState<string>("");
-
-  useEffect(() => {
-    setIsLoadingApiStatus(true);
-
-    getApiStatus().then((response: HealthcheckMessage | undefined) => {
-      setApiStatus(response === undefined ? "Error" : response.health);
-      setIsLoadingApiStatus(false);
-    });
-  }, []);
 
   return (
     <>
       <Page>
         <Container
           display="flex"
-          flexDir="row"
+          padding="2em"
+          paddingLeft="8rem"
+          paddingRight="8rem"
+          width="100%"
+          maxWidth="100%"
+          justifyContent="space-between"
         >
-          <Card maxWidth="15rem" marginRight="2rem">
-            <CardHeader>
-              <Heading size="md" textAlign="center">
-                API Status
-              </Heading>
-            </CardHeader>
-            <CardBody>
-              {isLoadingApiStatus ? (
-                <Skeleton width="100%" height="3rem" />
-              ) : (
-                <Container textAlign="center">
-                  <Text>{apiStatus}</Text>
-                </Container>
-              )}
-            </CardBody>
-          </Card>
-          <Card maxWidth="15rem">
-            <CardBody>
-              <Button
-                label="Sign out"
-                variant="text_only"
-                ariaLabel="Sign out button"
-                onClick={() => {
-                  window.localStorage.setItem("accessToken", "");
-
-                  navigate("/login");
-
-                  window.location.reload();
-                }}
-              />
-            </CardBody>
-          </Card>
+          <Text
+            fontSize="3xl"
+            fontWeight="bold"
+            color="#2B2D42"
+          >
+            Settings
+          </Text>
+          <Button
+            label="Edit"
+            variant="icon_text"
+            icon={HiOutlinePencil}
+            ariaLabel="Edit profile button"
+            style={{
+              padding: "1em"
+            }}
+            onClick={() => { navigate("/settings/edit"); }}
+          />
+        </Container>
+        <Container
+          display="flex"
+          flexDir="row"
+          padding="2em"
+          paddingLeft="8rem"
+          paddingRight="8rem"
+          width="100%"
+          maxWidth="100%"
+        >
+          <Avatar
+            name={authContext.loggedInUser?.firstName + " " + authContext.loggedInUser?.lastName}
+            size="2xl"
+          />
+          <Container
+            margin="0"
+            display="flex"
+            flexDirection="column"
+            width="11em"
+          >
+            <Container
+              margin="0"
+              padding="0.5em"
+              display="flex"
+              flexDir="row"
+              width="15em"
+            >
+              <Text
+                fontSize="lg"
+                fontWeight="bold"
+              >
+                First Name
+              </Text>
+            </Container>
+            <Container
+              margin="0"
+              padding="0.5em"
+              display="flex"
+              flexDir="row"
+              width="15em"
+            >
+              <Text
+                fontSize="lg"
+                fontWeight="bold"
+              >
+                Last Name
+              </Text>
+            </Container>
+            <Container
+              margin="0"
+              padding="0.5em"
+              display="flex"
+              flexDir="row"
+              width="15em"
+            >
+              <Text
+                fontSize="lg"
+                fontWeight="bold"
+              >
+                Email Address
+              </Text>
+            </Container>
+          </Container>
+          <Container
+            margin="0"
+            display="flex"
+            flexDirection="column"
+          >
+            <Container
+              margin="0"
+              padding="0.5em"
+              display="flex"
+              flexDir="row"
+              width="15em"
+            >
+              <Text
+                fontSize="lg"
+              >
+                {authContext.loggedInUser?.firstName}
+              </Text>
+            </Container>
+            <Container
+              margin="0"
+              padding="0.5em"
+              display="flex"
+              flexDir="row"
+              width="15em"
+            >
+              <Text
+                fontSize="lg"
+              >
+                {authContext.loggedInUser?.lastName}
+              </Text>
+            </Container>
+            <Container
+              margin="0"
+              padding="0.5em"
+              display="flex"
+              flexDir="row"
+              width="15em"
+            >
+              <Text
+                fontSize="lg"
+              >
+                {authContext.loggedInUser?.email}
+              </Text>
+            </Container>
+          </Container>
         </Container>
       </Page>
     </>

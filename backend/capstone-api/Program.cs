@@ -25,9 +25,11 @@ builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Registering data access.
 builder.Services.AddScoped<IAuthDataAccess, AuthDataAccess>();
+builder.Services.AddScoped<IUsersDataAccess, UsersDataAccess>();
 
 // Registering business logic.
 builder.Services.AddScoped<IAuthBusinessLogic, AuthBusinessLogic>();
+builder.Services.AddScoped<IUsersBusinessLogic, UsersBusinessLogic>();
 
 // Registering filters.
 builder.Services.AddControllers(options =>
