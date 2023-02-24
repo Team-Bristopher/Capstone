@@ -126,48 +126,51 @@ export const Navbar: FunctionComponent = () => {
                 </Container>
               )
             }
-            <Popover
-              placement="bottom"
-            >
-              <PopoverTrigger>
-                <div>
-                  <Button
-                    variant="icon_button"
-                    ariaLabel="Settings"
-                    icon={MdSettings}
-                    style={{
-                      width: "1em",
-                    }}
-                  />
-                </div>
-              </PopoverTrigger>
-              <PopoverContent
-                zIndex="1000"
-                padding="1em"
-                minWidth="1em"
-                width="10em"
+            {authContext.loggedInUser !== undefined && (
+              <Popover
+                placement="bottom"
               >
-                <ChakraButton
-                  padding="0.5rem"
-                  margin="0"
-                  width="100%"
-                  height="3rem"
-                  onClick={() => { navigate("/settings"); }}
+                <PopoverTrigger>
+                  <div>
+                    <Button
+                      variant="icon_button"
+                      ariaLabel="Settings"
+                      icon={MdSettings}
+                      style={{
+                        width: "1em",
+                      }}
+                    />
+                  </div>
+                </PopoverTrigger>
+
+                <PopoverContent
+                  zIndex="1000"
+                  padding="1em"
+                  minWidth="1em"
+                  width="10em"
                 >
-                  Profile
-                </ChakraButton>
-                <ChakraButton
-                  padding="0.5rem"
-                  margin="0"
-                  width="100%"
-                  height="3rem"
-                  marginTop="1em"
-                  onClick={signOut}
-                >
-                  Sign Out
-                </ChakraButton>
-              </PopoverContent>
-            </Popover>
+                  <ChakraButton
+                    padding="0.5rem"
+                    margin="0"
+                    width="100%"
+                    height="3rem"
+                    onClick={() => { navigate("/settings"); }}
+                  >
+                    Profile
+                  </ChakraButton>
+                  <ChakraButton
+                    padding="0.5rem"
+                    margin="0"
+                    width="100%"
+                    height="3rem"
+                    marginTop="1em"
+                    onClick={signOut}
+                  >
+                    Sign Out
+                  </ChakraButton>
+                </PopoverContent>
+              </Popover>
+            )}
           </Box>
         </Container>
       </Container>

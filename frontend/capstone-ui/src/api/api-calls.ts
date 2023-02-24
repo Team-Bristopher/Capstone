@@ -1,4 +1,5 @@
 import { EditUserMessageResponse } from "../models/incoming/EditUserMessageResponse";
+import { FundraiserDonationAmountMessage } from "../models/incoming/FundraiserDonationAmountMessage";
 import { HealthcheckMessage } from "../models/incoming/HealthcheckResponse";
 import { LoggedInUserResponse } from "../models/incoming/LoggedInUserResponse";
 import { MyUserResponse } from "../models/incoming/MyUserResponse";
@@ -152,4 +153,18 @@ export const editUserData = (message: EditUserMessage): Promise<EditUserMessageR
           } as EditUserMessageResponse
       }
     });
+}
+
+export const getFundraiserAmount = (fundraiserID: string): Promise<FundraiserDonationAmountMessage | undefined> => {
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/donation-amount?fundraiserID=${fundraiserID}`)
+    .then(async (resp) => {
+      switch (resp.status) {
+        case 200:
+          return await resp.json() as FundraiserDonationAmountMessage;
+        default:
+          return {
+            amount: 0,
+          } as FundraiserDonationAmountMessage
+      }
+    })
 }
