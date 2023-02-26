@@ -1,5 +1,6 @@
 ﻿using System;
 using capstone_api.BusinessLogic;
+using capstone_api.IncomingMessages;
 using capstone_api.OutgoingMessages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,26 @@ namespace capstone_api.Controllers
 
 			return Ok(message);
 		}
-	}
+
+		[HttpPost("create")]
+        [Authorize(Policy = "RegisteredUser")]
+		public IActionResult CreateFundraiser(
+			[FromBody] CreateFundraiserMessage message)
+		{
+            CreateFundraiserResponseMessage response = _fundraiserBusinessLogic.CreateFundraiser(message);
+
+			return Ok(response);
+		}
+
+		[HttpGet]
+		[AllowAnonymous]
+		public IActionResult GetFundraisers(
+			[FromQuery] int page)
+		{
+			IEnumerable<FundraiserMessage> fundraisers = _fundraiserBusinessLogic.GetFundraisers(page);
+
+			return Ok(fundraisers);
+		}
+    }
 }
 

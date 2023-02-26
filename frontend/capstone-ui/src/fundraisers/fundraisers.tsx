@@ -1,6 +1,9 @@
-import { Grid, GridItem } from "@chakra-ui/react";
-import { FunctionComponent } from "react";
-import { Fundraiser, FundraiserTypes } from "../fundraiser/fundraiser";
+import { Grid, GridItem, Skeleton } from "@chakra-ui/react";
+import { FunctionComponent, useCallback, useEffect } from "react";
+import { useInfiniteQuery } from "react-query";
+import { getFundraisers } from "../api/api-calls";
+import { Fundraiser as FundraiserComponent } from "../fundraiser/fundraiser";
+import { Fundraiser } from "../models/incoming/Fundraiser";
 
 // These props describe filtering options.
 interface FundraisersProps {
@@ -9,8 +12,33 @@ interface FundraisersProps {
 }
 
 export const Fundraisers: FunctionComponent<FundraisersProps> = (props: FundraisersProps) => {
-   return (
-      <>
+   const fetchFundraisers = useCallback(async ({ pageParam = 0 }) => {
+      const fundraisers = await getFundraisers(pageParam);
+
+      return fundraisers;
+   }, [props]);
+
+   const { data, fetchNextPage, hasNextPage, isFetching, refetch } = useInfiniteQuery<Fundraiser[]>({
+      queryKey: ["fundraisers"],
+      queryFn: fetchFundraisers,
+      refetchOnWindowFocus: false,
+      getNextPageParam: (lastPage, pages) => {
+         if (lastPage === undefined) {
+            return undefined;
+         }
+
+         return (lastPage.length < 6)
+            ? undefined
+            : pages.length
+      },
+   });
+
+   useEffect(() => {
+      refetch();
+   }, [props]);
+
+   if (isFetching) {
+      return (
          <Grid
             templateColumns="repeat(3, 1fr)"
             overflow="auto"
@@ -20,62 +48,72 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
          >
             <GridItem
                w="100%"
-               h='auto'
+               h="auto"
             >
-               <Fundraiser
-                  ID="sajdksajd"
-                  type={{
-                     ID: "sdja",
-                     Type: FundraiserTypes.Animal_Welfare,
-                  }}
-                  title="This is a title"
-                  description="This is description"
-                  views={12345}
-                  target={125000}
-                  createdOn={new Date()}
-                  modifiedOn={new Date()}
-                  createdByID="2323"
+               <Skeleton
+                  width="30em"
+                  height="35em"
                />
             </GridItem>
             <GridItem
                w="100%"
-               h='auto'
+               h="auto"
             >
-               <Fundraiser
-                  ID="sajdksajd"
-                  type={{
-                     ID: "sdja",
-                     Type: FundraiserTypes.Animal_Welfare,
-                  }}
-                  title="This is a title"
-                  description="This is description"
-                  views={12345}
-                  target={125000}
-                  createdOn={new Date()}
-                  modifiedOn={new Date()}
-                  createdByID="2323"
+               <Skeleton
+                  width="30em"
+                  height="35em"
                />
             </GridItem>
             <GridItem
                w="100%"
-               h='auto'
+               h="auto"
             >
-               <Fundraiser
-                  ID="sajdksajd"
-                  type={{
-                     ID: "sdja",
-                     Type: FundraiserTypes.Animal_Welfare,
-                  }}
-                  title="This is a title"
-                  description="This is description"
-                  views={12345}
-                  target={125000}
-                  createdOn={new Date()}
-                  modifiedOn={new Date()}
-                  createdByID="2323"
+               <Skeleton
+                  width="30em"
+                  height="35em"
                />
             </GridItem>
          </Grid>
+      );
+   }
+
+   return (
+      <>
+         <Grid
+            templateColumns="repeat(3, 1fr)"
+            overflow="auto"
+            display="flex"
+            flexDir="row"
+            width="100%"
+            justifyContent="space-between"
+         >
+            {(data?.pages || []).map((fundraiserPage, idx) => (
+               <>
+                  {(fundraiserPage.map((fundraiser: Fundraiser) => (
+                     <>
+                        <GridItem
+                           w="100%"
+                           h="auto"
+                           key={fundraiser.id}
+                        >
+                           <FundraiserComponent
+                              ID={fundraiser.id}
+                              type={fundraiser.type}
+                              title={fundraiser.title}
+                              description={fundraiser.description}
+                              views={fundraiser.views}
+                              target={fundraiser.target}
+                              createdByID={fundraiser.createdBy}
+                              createdOn={fundraiser.createdOn}
+                              modifiedOn={fundraiser.modifiedOn}
+                              endDate={fundraiser.endDate}
+                           />
+                        </GridItem>
+                     </>
+                  )))}
+               </>
+            ))}
+         </Grid>
       </>
    );
-}
+} 

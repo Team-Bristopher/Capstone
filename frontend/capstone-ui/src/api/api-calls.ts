@@ -1,9 +1,12 @@
+import { CreateFundraiserResponseMessage, CreateFundraiserResponseMessageRaw } from "../models/incoming/CreateFundraiserResponseMessage";
 import { EditUserMessageResponse } from "../models/incoming/EditUserMessageResponse";
+import { Fundraiser } from "../models/incoming/Fundraiser";
 import { FundraiserDonationAmountMessage } from "../models/incoming/FundraiserDonationAmountMessage";
 import { HealthcheckMessage } from "../models/incoming/HealthcheckResponse";
 import { LoggedInUserResponse } from "../models/incoming/LoggedInUserResponse";
 import { MyUserResponse } from "../models/incoming/MyUserResponse";
 import { RegisterUserResponse } from "../models/incoming/RegisterUserResponse";
+import { CreateFundraiserMessage } from "../models/outgoing/CreateFundraiserMessage";
 import { EditUserMessage } from "../models/outgoing/EditUserMessage";
 import { LoginUserMessage } from "../models/outgoing/LoginUserMessage";
 import { RegisterUserMessage } from "../models/outgoing/RegisterUserMessage";
@@ -165,6 +168,49 @@ export const getFundraiserAmount = (fundraiserID: string): Promise<FundraiserDon
           return {
             amount: 0,
           } as FundraiserDonationAmountMessage
+      }
+    })
+}
+
+export const createFundraiser = (createFundraserMessage: CreateFundraiserMessage): Promise<CreateFundraiserResponseMessage> => {
+  const authorization = localStorage.getItem("accessToken");
+
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/create`, {
+    headers: {
+      "Authorization": "Bearer " + (authorization || ""),
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(createFundraserMessage),
+  })
+    .then(async (resp) => {
+      switch (resp.status) {
+        case 200:
+          const responseJson: CreateFundraiserResponseMessageRaw = await resp.json();
+
+          return {
+            responseType: "success",
+            fundraiserID: responseJson.fundraiserID,
+          } as CreateFundraiserResponseMessage
+        default:
+          return {
+            responseType: "error",
+            fundraiserID: "",
+          } as CreateFundraiserResponseMessage
+      }
+    })
+}
+
+export const getFundraisers = (page: number): Promise<Array<Fundraiser>> => {
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/`)
+    .then(async (resp) => {
+      switch (resp.status) {
+        case 200:
+          const response = await resp.json();
+
+          return response;
+        default:
+          return [];
       }
     })
 }

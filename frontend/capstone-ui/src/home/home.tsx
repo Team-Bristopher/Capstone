@@ -10,6 +10,7 @@ import { Page } from "../page/page";
 
 export const Home: FunctionComponent = () => {
   const authContext = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   return (

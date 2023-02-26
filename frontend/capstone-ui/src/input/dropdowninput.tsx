@@ -43,12 +43,13 @@ export const DropdownInput: FunctionComponent<DropdownInputProps> = (props: Drop
             </Text>
             <Select
                marginLeft="auto"
-               width="18rem"
+               width="22rem"
                color="white"
                backgroundColor="#8D99AE"
-               height="2rem"
+               height="2.5rem"
                marginRight="0.2rem"
                fontWeight="bold"
+               onChange={(e) => { console.info(e); props.onChange(e.target.value); }}
             >
                {props.values.map((val) => (
                   <option value={val.value}>{val.name}</option>

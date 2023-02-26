@@ -1,6 +1,7 @@
-import { Box, Icon, InputGroup, InputLeftElement, NumberInput as ChakraNumberInput, NumberInputField, StyleProps, Text } from "@chakra-ui/react";
+import { Box, Icon, InputGroup, InputLeftElement, NumberInput as ChakraNumberInput, NumberInputField, Popover, PopoverBody, PopoverContent, PopoverTrigger, StyleProps, Text } from "@chakra-ui/react";
 import { FunctionComponent } from "react";
 import { RegisterOptions, UseFormRegister } from "react-hook-form";
+import { BiError } from "react-icons/bi";
 import { IconType } from "react-icons/lib";
 
 export interface FormRegisterInfo {
@@ -25,6 +26,10 @@ interface NumberInputProps {
 }
 
 export const NumberInput: FunctionComponent<NumberInputProps> = (props: NumberInputProps) => {
+   const hasError = (): boolean => {
+      return props.formInfo?.errorMessage !== undefined && props.formInfo.errorMessage.length > 0;
+   }
+
    return (
       <>
          <Box
@@ -39,6 +44,7 @@ export const NumberInput: FunctionComponent<NumberInputProps> = (props: NumberIn
             display="flex"
             flexDir="row"
             alignItems="center"
+            alignContent="center"
             height="3.5em"
             aria-label={props.ariaLabel}
             {...props.containerStyle}
@@ -86,6 +92,25 @@ export const NumberInput: FunctionComponent<NumberInputProps> = (props: NumberIn
                      {...props.style}
                   />
                </ChakraNumberInput>
+               {hasError() &&
+                  <Popover placement="top" trigger="hover">
+                     <PopoverTrigger>
+                        <div>
+                           <Icon
+                              as={BiError}
+                              boxSize="8"
+                              color="#D90429"
+                              marginLeft="0.2em"
+                           />
+                        </div>
+                     </PopoverTrigger>
+                     <PopoverContent zIndex="1000">
+                        <PopoverBody textAlign="center">
+                           {props.formInfo?.errorMessage || ""}
+                        </PopoverBody>
+                     </PopoverContent>
+                  </Popover>
+               }
             </InputGroup>
          </Box>
       </>

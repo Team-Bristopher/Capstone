@@ -60,8 +60,28 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                   fontSize="xl"
                   textAlign="start"
                   marginBottom="0.2em"
+                  display="flex"
                >
                   {props.label}
+                  {hasError() &&
+                     <Popover placement="top" trigger="hover">
+                        <PopoverTrigger>
+                           <div>
+                              <Icon
+                                 as={BiError}
+                                 boxSize="8"
+                                 color="#D90429"
+                                 marginLeft="0.2em"
+                              />
+                           </div>
+                        </PopoverTrigger>
+                        <PopoverContent zIndex="1000">
+                           <PopoverBody textAlign="center">
+                              {props.formInfo?.errorMessage || ""}
+                           </PopoverBody>
+                        </PopoverContent>
+                     </Popover>
+                  }
                </Text>
                <Input
                   backgroundColor="white"
@@ -78,25 +98,6 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                   {...props.style}
                   placeholder={props.placeholder}
                />
-               {hasError() &&
-                  <Popover placement="top" trigger="hover">
-                     <PopoverTrigger>
-                        <div>
-                           <Icon
-                              as={BiError}
-                              boxSize="8"
-                              color="#D90429"
-                              margin="0.2em"
-                           />
-                        </div>
-                     </PopoverTrigger>
-                     <PopoverContent zIndex="1000">
-                        <PopoverBody textAlign="center">
-                           {props.formInfo?.errorMessage || ""}
-                        </PopoverBody>
-                     </PopoverContent>
-                  </Popover>
-               }
             </Box>
          </>
       );

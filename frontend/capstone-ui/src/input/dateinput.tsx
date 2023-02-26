@@ -1,7 +1,8 @@
-import { Box, Icon, Input, InputGroup, InputLeftElement, StyleProps, Text } from "@chakra-ui/react";
+import { Box, Icon, Input, InputGroup, InputLeftElement, Popover, PopoverBody, PopoverContent, PopoverTrigger, StyleProps, Text } from "@chakra-ui/react";
 import { FunctionComponent } from "react";
 import { RegisterOptions, UseFormRegister } from "react-hook-form";
 import { IconType } from "react-icons";
+import { BiError } from "react-icons/bi";
 
 export interface FormRegisterInfo {
    name: string;
@@ -20,6 +21,10 @@ interface DateInputProps {
 }
 
 export const DateInput: FunctionComponent<DateInputProps> = (props: DateInputProps) => {
+   const hasError = (): boolean => {
+      return props.formInfo?.errorMessage !== undefined && props.formInfo.errorMessage.length > 0;
+   }
+
    return (
       <>
          <Box
@@ -72,6 +77,25 @@ export const DateInput: FunctionComponent<DateInputProps> = (props: DateInputPro
                   {...props.formInfo?.registerFn(props.formInfo?.name || '', props.formInfo?.registerOptions)}
                   {...props.style}
                />
+               {hasError() &&
+                  <Popover placement="top" trigger="hover">
+                     <PopoverTrigger>
+                        <div>
+                           <Icon
+                              as={BiError}
+                              boxSize="8"
+                              color="#D90429"
+                              marginLeft="0.2em"
+                           />
+                        </div>
+                     </PopoverTrigger>
+                     <PopoverContent zIndex="1000">
+                        <PopoverBody textAlign="center">
+                           {props.formInfo?.errorMessage || ""}
+                        </PopoverBody>
+                     </PopoverContent>
+                  </Popover>
+               }
             </InputGroup>
          </Box>
       </>

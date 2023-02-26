@@ -47,6 +47,11 @@ namespace capstone_api
         public DbSet<GlobalAdmin> GlobalAdmins { get; set; }
 
         /// <summary>
+        /// The FundraiserTypes database context.
+        /// </summary>
+        public DbSet<FundraiserType> FundraiserType { get; set; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         public DatabaseContext(DbContextOptions<DatabaseContext> options)

@@ -1,9 +1,9 @@
-import { Box, Container, Icon, Text } from "@chakra-ui/react";
+import { Box, Container, Icon, Popover, PopoverBody, PopoverContent, PopoverTrigger, Text } from "@chakra-ui/react";
 import { FunctionComponent } from "react";
 import { BsFillEyeFill } from "react-icons/bs";
 import { FundraiserDonationBar } from "../fundraiser-donation-bar/fundraiser_donation_bar";
 
-export enum FundraiserTypes {
+export enum FundraiserType {
    Medical = 0,
    Education = 1,
    Disaster_Relief = 2,
@@ -15,14 +15,9 @@ export enum FundraiserTypes {
    Political = 8,
 }
 
-interface FundriaserType {
+export interface FundraiserProps {
    ID: string;
-   Type: FundraiserTypes;
-}
-
-interface FundraiserProps {
-   ID: string;
-   type: FundriaserType;
+   type: FundraiserType;
    title: string;
    description: string;
    views: number;
@@ -30,6 +25,7 @@ interface FundraiserProps {
    createdOn: Date;
    modifiedOn: Date;
    createdByID: string;
+   endDate: Date;
 }
 
 export const Fundraiser: FunctionComponent<FundraiserProps> = (props: FundraiserProps) => {
@@ -64,7 +60,7 @@ export const Fundraiser: FunctionComponent<FundraiserProps> = (props: Fundraiser
                   fontSize="1.2rem"
                   fontWeight="bold"
                   marginTop="0.5em"
-                  maxWidth="150px"
+                  maxWidth="90%"
                   textOverflow="ellipsis"
                >
                   {props.title}
@@ -89,21 +85,35 @@ export const Fundraiser: FunctionComponent<FundraiserProps> = (props: Fundraiser
                   </Text>
                </Box>
             </Box>
-            <Box
-               margin="0"
-               padding="0"
-               minHeight="10%"
-               width="100%"
-               display="flex"
-               flexDir="row"
-               marginTop="0.3em"
-            >
-               <Text
-                  textOverflow="ellipsis"
-               >
-                  {props.description}
-               </Text>
-            </Box>
+            <Popover placement="top" trigger="hover">
+               <PopoverTrigger>
+                  <Box
+                     margin="0"
+                     padding="0"
+                     minHeight="10%"
+                     maxHeight="10%"
+                     width="100%"
+                     display="flex"
+                     flexDir="row"
+                     marginTop="0.3em"
+                  >
+                     <Text
+                        textOverflow="ellipsis"
+                        overflow="hidden"
+                        maxWidth="100%"
+                        maxHeight="20px"
+                        whiteSpace="nowrap"
+                     >
+                        {props.description}
+                     </Text>
+                  </Box>
+               </PopoverTrigger>
+               <PopoverContent zIndex="1000">
+                  <PopoverBody textAlign="center">
+                     {props.description}
+                  </PopoverBody>
+               </PopoverContent>
+            </Popover>
             <Box
                margin="0"
                padding="0"
@@ -111,11 +121,11 @@ export const Fundraiser: FunctionComponent<FundraiserProps> = (props: Fundraiser
                width="100%"
                display="flex"
                flexDir="row"
-               marginTop="0"
             >
                <FundraiserDonationBar
                   fundraiserGoal={props.target}
                   fundraiserID={props.ID}
+                  endDate={props.endDate}
                />
             </Box>
          </Container>

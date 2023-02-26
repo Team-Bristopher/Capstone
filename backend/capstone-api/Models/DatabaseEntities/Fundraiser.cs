@@ -22,7 +22,7 @@ namespace capstone_api.Models.DatabaseEntities
         /// The type of the Fundraiser.
         /// </summary>
         [Required]
-        public FundraiserType Type { get; set; }
+        public FundraiserType? Type { get; set; }
 
 		/// <summary>
 		/// The title of the Fundraiser.
@@ -63,6 +63,12 @@ namespace capstone_api.Models.DatabaseEntities
 		/// </summary>
 		[Required]
 		public DateTime ModifiedOn { get; set; }
+
+        /// <summary>
+        /// The date and time the Fundraiser will expire.
+        /// </summary>
+        [Required]
+        public DateTime EndDate { get; set; }
 
         /// <summary>
         /// The unique identifier of the user that created
