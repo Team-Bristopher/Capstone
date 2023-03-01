@@ -13,6 +13,6 @@ it("renders navbar", () => {
   // Children existence.
   expect(navbar.container.childNodes.length).toBeGreaterThan(0);
 
-  // Settings button existence.
-  expect(navbar.getByLabelText("Settings")).toBeTruthy();
+  // Login button existence.
+  expect(navbar.getByText("Log In")).toBeTruthy();
 });
