@@ -1,5 +1,7 @@
 import { FunctionComponent } from "react";
 import { Route, Routes } from "react-router-dom";
+import { CreateFundraiser } from "./create-fundraiser/create_fundraiser";
+import { FundraiserDetail } from "./fundraiser-detail/fundraiser_detail";
 import { Home } from "./home/home";
 import { Login } from "./login/login";
 import { NotFound } from "./notfound/notfound";
@@ -16,6 +18,9 @@ export const App: FunctionComponent = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="*" element={<NotFound />} />
+
+        <Route path="fundraiser/:fundraiserID" element={<FundraiserDetail />} />
+        <Route path="fundraiser/create" element={<CreateFundraiser />} />
 
         <Route path="settings" element={<Settings />} />
         <Route path="settings/edit" element={<SettingsEdit />} />

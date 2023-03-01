@@ -67,6 +67,12 @@ namespace capstone_api.Models.DatabaseEntities
         /// </summary>
         [Required]
         public List<Fundraiser> CreatedFundraisers { get; set; } = new List<Fundraiser>();
+
+        /// <summary>
+        /// The fundraisers this User has viewed.
+        /// </summary>
+        [Required]
+        public List<FundraiserView> ViewedFundraisers { get; set; } = new List<FundraiserView>();
     }
 }
 

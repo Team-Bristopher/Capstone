@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using capstone_api;
@@ -11,9 +12,11 @@ using capstone_api;
 namespace capstoneapi.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20230226204634_AddEndDateColumnToFundraisers")]
+    partial class AddEndDateColumnToFundraisers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,6 +115,9 @@ namespace capstoneapi.Migrations
                     b.Property<Guid>("TypeID")
                         .HasColumnType("uuid");
 
+                    b.Property<long>("Views")
+                        .HasColumnType("bigint");
+
                     b.HasKey("ID");
 
                     b.HasIndex("CreatedByUserID");
@@ -195,30 +201,6 @@ namespace capstoneapi.Migrations
                             ID = new Guid("64d3f6df-5597-4856-9627-e72aadd323e9"),
                             Type = 8
                         });
-                });
-
-            modelBuilder.Entity("capstone_api.Models.DatabaseEntities.FundraiserView", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("FundraiserID")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ViewedByID")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ViewedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("FundraiserID");
-
-                    b.HasIndex("ViewedByID");
-
-                    b.ToTable("FundraiserViews", "Capstone");
                 });
 
             modelBuilder.Entity("capstone_api.Models.DatabaseEntities.GlobalAdmin", b =>
@@ -348,25 +330,6 @@ namespace capstoneapi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("capstone_api.Models.DatabaseEntities.FundraiserView", b =>
-                {
-                    b.HasOne("capstone_api.Models.DatabaseEntities.Fundraiser", "ViewedFundraiser")
-                        .WithMany("Views")
-                        .HasForeignKey("FundraiserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("capstone_api.Models.DatabaseEntities.User", "ViewedByUser")
-                        .WithMany("ViewedFundraisers")
-                        .HasForeignKey("ViewedByID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ViewedByUser");
-
-                    b.Navigation("ViewedFundraiser");
-                });
-
             modelBuilder.Entity("capstone_api.Models.DatabaseEntities.GlobalAdmin", b =>
                 {
                     b.HasOne("capstone_api.Models.DatabaseEntities.User", "User")
@@ -385,8 +348,6 @@ namespace capstoneapi.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Donations");
-
-                    b.Navigation("Views");
                 });
 
             modelBuilder.Entity("capstone_api.Models.DatabaseEntities.User", b =>
@@ -396,8 +357,6 @@ namespace capstoneapi.Migrations
                     b.Navigation("CreatedFundraisers");
 
                     b.Navigation("Donations");
-
-                    b.Navigation("ViewedFundraisers");
                 });
 #pragma warning restore 612, 618
         }

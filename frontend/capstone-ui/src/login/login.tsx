@@ -189,6 +189,19 @@ export const Login: FunctionComponent = () => {
                         errorMessage: formState.errors.password?.message || "",
                      }}
                   />
+                  <Link
+                     as={ReactRouterLink}
+                     to="/forgot-password"
+                  >
+                     <Text
+                        color="#D90429"
+                        marginLeft="0.5em"
+                        fontWeight="bold"
+                        fontSize="0.8em"
+                     >
+                        Forgot password?
+                     </Text>
+                  </Link>
                </Container>
                <Container
                   width="auto"
@@ -196,6 +209,7 @@ export const Login: FunctionComponent = () => {
                   height="auto"
                   marginTop="2em"
                   display="flex"
+                  flexDir="row"
                   justifyContent="center"
                >
                   <Button

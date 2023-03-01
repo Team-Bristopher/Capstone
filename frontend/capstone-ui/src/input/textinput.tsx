@@ -21,6 +21,8 @@ interface TextInputProps {
    hideText?: boolean;
    style?: StyleProps;
    containerStyle?: StyleProps;
+   placeholder?: string;
+   isTopDown?: boolean;
 }
 
 export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputProps) => {
@@ -32,6 +34,73 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
 
    const hasError = (): boolean => {
       return props.formInfo?.errorMessage !== undefined && props.formInfo.errorMessage.length > 0;
+   }
+
+   if (props.isTopDown !== undefined && props.isTopDown) {
+      return (
+         <>
+            <Box
+               minWidth="20em"
+               borderRadius="10px"
+               backgroundColor="#D9D9D9"
+               padding="0.5em"
+               marginRight="0"
+               marginLeft="0"
+               marginTop="1em"
+               marginBottom="1em"
+               display="flex"
+               flexDir="column"
+               alignItems="center"
+               aria-label={props.ariaLabel}
+               {...props.containerStyle}
+            >
+               <Text
+                  color="white"
+                  minWidth="100%"
+                  fontSize="xl"
+                  textAlign="start"
+                  marginBottom="0.2em"
+                  display="flex"
+               >
+                  {props.label}
+                  {hasError() &&
+                     <Popover placement="top" trigger="hover">
+                        <PopoverTrigger>
+                           <div>
+                              <Icon
+                                 as={BiError}
+                                 boxSize="8"
+                                 color="#D90429"
+                                 marginLeft="0.2em"
+                              />
+                           </div>
+                        </PopoverTrigger>
+                        <PopoverContent zIndex="1000">
+                           <PopoverBody textAlign="center">
+                              {props.formInfo?.errorMessage || ""}
+                           </PopoverBody>
+                        </PopoverContent>
+                     </Popover>
+                  }
+               </Text>
+               <Input
+                  backgroundColor="white"
+                  aria-label={props.ariaLabel}
+                  _focusWithin={{
+                     "border": "2px solid #2B2D42",
+                  }}
+                  _focusVisible={{
+                     "border": "2px solid #2B2D42",
+                  }}
+                  onChange={onInputChanged}
+                  type={props.hideText ? "password" : undefined}
+                  {...props.formInfo?.registerFn(props.formInfo?.name || '', props.formInfo?.registerOptions)}
+                  {...props.style}
+                  placeholder={props.placeholder}
+               />
+            </Box>
+         </>
+      );
    }
 
    return (
@@ -83,6 +152,7 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                type={props.hideText ? "password" : undefined}
                {...props.formInfo?.registerFn(props.formInfo?.name || '', props.formInfo?.registerOptions)}
                {...props.style}
+               placeholder={props.placeholder}
             />
             {hasError() &&
                <Popover placement="top" trigger="hover">

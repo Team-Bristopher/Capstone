@@ -1,9 +1,10 @@
+export const REQUIRED_FIELD_ERROR: string = "This is required.";
+
+
 // Name verification (first & last).
 export const NAME_REGEX: RegExp = new RegExp("^[a-zA-Z]{3,15}$");
 
 export const INVALID_NAME_ERROR: string = "Name not valid.";
-
-export const REQUIRED_FIELD_ERROR: string = "This is required.";
 
 export const NAME_TOO_SHORT_ERROR: string = "Name must exceed 3 characters.";
 
@@ -28,4 +29,25 @@ export const PASSWORD_TOO_SHORT_ERROR: string = "Password must exceed 5 characte
 export const PASSWORD_TOO_LONG_ERROR: string = "Password must not exceed 50 characters.";
 
 export const PASSWORDS_DONT_MATCH = "Passwords don't match.";
+
+// Fundraiser verification.
+export const FUNDRAISER_TITLE_REGEX: RegExp = new RegExp("^.{3,256}$");
+
+export const FUNDRAISER_DESCRIPTION_REGEX: RegExp = new RegExp("^.{3,5026}$");
+
+export const INVALID_FUNDRAISER_TITLE_ERROR: string = "Title is not valid.";
+
+export const INVALID_FUNDRAISER_DESCRIPTION_ERROR: string = "Description is not valid.";
+
+export const INVALID_FUNDRAISER_DESCRIPTION_TITLE_ERROR: string = "Description is not valid.";
+
+export const FUNDRAISER_TITLE_TOO_SHORT_ERROR: string = "Title must exceed 3 characters.";
+
+export const FUNDRAISER_TITLE_TOO_LONG_ERROR: string = "Title must not exceed 256 characters.";
+
+export const FUNDRAISER_DESCRIPTION_TOO_SHORT_ERROR: string = "Description must exceed 3 characters.";
+
+export const FUNDRAISER_DESCRIPTION_TOO_LONG_ERROR: string = "Description must not exceed 5026 characters.";
+
+export const GOAL_TOO_SMALL_ERROR: string = "Goal cannot be 0.";
 

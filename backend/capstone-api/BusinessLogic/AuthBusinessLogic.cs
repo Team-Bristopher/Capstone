@@ -38,6 +38,13 @@ namespace capstone_api.BusinessLogic
 		public string LoginUser(LoginUserMessage message);
 
 		/// <summary>
+		/// Gets a user by ID.
+		/// </summary>
+		/// <param name="userID">The ID of the user.</param>
+		/// <returns>The user if found, null otherwise.</returns>
+		public User? GetUserByID(Guid userID);
+
+		/// <summary>
 		/// Gets the current logged in user.
 		/// </summary>
 		/// <returns>A message containing the logged in user.</returns>
@@ -201,6 +208,12 @@ namespace capstone_api.BusinessLogic
 				Role = userRole!.Value,
 			};
         }
+
+		/// <inheritdoc />
+        public User? GetUserByID(Guid userID)
+		{
+			return _authDataAccess.GetUserByID(userID);
+		}
     }
 }
 

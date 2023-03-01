@@ -22,7 +22,7 @@ namespace capstone_api.Models.DatabaseEntities
         /// The type of the Fundraiser.
         /// </summary>
         [Required]
-        public FundraiserType Type { get; set; }
+        public FundraiserType? Type { get; set; }
 
 		/// <summary>
 		/// The title of the Fundraiser.
@@ -41,12 +41,6 @@ namespace capstone_api.Models.DatabaseEntities
         public string Description { get; set; } = string.Empty;
 
         /// <summary>
-        /// The amount of views of the Fundraiser.
-        /// </summary>
-        [Required]
-        public long Views { get; set; }
-
-        /// <summary>
         /// The USD target of the Fundraiser.
         /// </summary>
         [Required]
@@ -57,12 +51,18 @@ namespace capstone_api.Models.DatabaseEntities
 		/// </summary>
 		[Required]
 		public DateTime CreatedOn { get; set; }
-
+ 
 		/// <summary>
 		/// The date and time the Fundraiser was last modified.
 		/// </summary>
 		[Required]
 		public DateTime ModifiedOn { get; set; }
+
+        /// <summary>
+        /// The date and time the Fundraiser will expire.
+        /// </summary>
+        [Required]
+        public DateTime EndDate { get; set; }
 
         /// <summary>
         /// The unique identifier of the user that created
@@ -95,6 +95,12 @@ namespace capstone_api.Models.DatabaseEntities
         /// </summary>
         [Required]
         public List<FundraiserAdmin> Admins { get; set; } = new List<FundraiserAdmin>();
+
+        /// <summary>
+        /// The views related ot this fundraiser.
+        /// </summary>
+        [Required]
+        public List<FundraiserView> Views { get; set; } = new List<FundraiserView>();
     }
 }
 
