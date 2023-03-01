@@ -16,9 +16,11 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
       const fundraisers = await getFundraisers(pageParam);
 
       return fundraisers;
+
+      // eslint-disable-next-line
    }, [props]);
 
-   const { data, fetchNextPage, hasNextPage, isFetching, refetch } = useInfiniteQuery<Fundraiser[]>({
+   const { data, isFetching, refetch } = useInfiniteQuery<Fundraiser[]>({
       queryKey: ["fundraisers"],
       queryFn: fetchFundraisers,
       refetchOnWindowFocus: false,
@@ -35,6 +37,8 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
 
    useEffect(() => {
       refetch();
+
+      // eslint-disable-next-line
    }, [props]);
 
    if (isFetching) {

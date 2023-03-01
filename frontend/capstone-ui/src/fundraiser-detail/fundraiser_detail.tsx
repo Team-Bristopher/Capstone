@@ -71,6 +71,8 @@ export const FundraiserDetail: FunctionComponent = () => {
 
       sendGetFundraiserInformationRequest();
       sendGetAmountRequest();
+
+      // eslint-disable-next-line
    }, [params]);
 
    useEffect(() => {
@@ -78,6 +80,8 @@ export const FundraiserDetail: FunctionComponent = () => {
       if (authContext?.loggedInUser !== undefined && params?.fundraiserID !== undefined && !isLoading) {
          viewFundraiser(params?.fundraiserID ?? "");
       }
+
+      // eslint-disable-next-line
    }, [authContext?.loggedInUser, isLoading]);
 
    if (isLoading) {

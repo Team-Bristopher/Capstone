@@ -27,6 +27,8 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
 
    useEffect(() => {
       sendGetAmountRequest();
+
+      // eslint-disable-next-line
    }, [props]);
 
    return (

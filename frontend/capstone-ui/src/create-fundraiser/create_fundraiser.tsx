@@ -42,7 +42,7 @@ export const CreateFundraiser: FunctionComponent = () => {
 
    const authContext = useContext(AuthContext);
 
-   const { register, getValues, formState, handleSubmit, setValue } = useForm<CreateFundraiserForm>({
+   const { register, getValues, formState, handleSubmit } = useForm<CreateFundraiserForm>({
       criteriaMode: "all",
       reValidateMode: "onChange",
    });
