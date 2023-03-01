@@ -1,6 +1,7 @@
 import { Box, Container, Icon, Popover, PopoverBody, PopoverContent, PopoverTrigger, Text } from "@chakra-ui/react";
 import { FunctionComponent } from "react";
 import { BsFillEyeFill } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 import { FundraiserDonationBar } from "../fundraiser-donation-bar/fundraiser_donation_bar";
 
 export enum FundraiserType {
@@ -29,6 +30,8 @@ export interface FundraiserProps {
 }
 
 export const Fundraiser: FunctionComponent<FundraiserProps> = (props: FundraiserProps) => {
+   const navigate = useNavigate();
+
    return (
       <>
          <Container
@@ -39,6 +42,10 @@ export const Fundraiser: FunctionComponent<FundraiserProps> = (props: Fundraiser
             padding="10px"
             display="flex"
             flexDir="column"
+            _hover={{
+               "cursor": "pointer"
+            }}
+            onClick={() => { navigate(`fundraiser/${props.ID}`); }}
          >
             <Box
                margin="0"

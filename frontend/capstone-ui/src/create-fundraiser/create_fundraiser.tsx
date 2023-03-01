@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { AiOutlinePlus } from "react-icons/ai";
 import { BiCalendar } from "react-icons/bi";
 import { MdOutlineAttachMoney } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 import { createFundraiser } from "../api/api-calls";
 import { AuthContext } from "../globals/auth_context";
 import { FUNDRAISER_DESCRIPTION_REGEX, FUNDRAISER_DESCRIPTION_TOO_LONG_ERROR, FUNDRAISER_DESCRIPTION_TOO_SHORT_ERROR, FUNDRAISER_TITLE_REGEX, FUNDRAISER_TITLE_TOO_LONG_ERROR, FUNDRAISER_TITLE_TOO_SHORT_ERROR, GOAL_TOO_SMALL_ERROR, INVALID_FUNDRAISER_DESCRIPTION_ERROR, INVALID_FUNDRAISER_TITLE_ERROR, REQUIRED_FIELD_ERROR } from "../globals/form_globals";
@@ -35,6 +36,8 @@ interface CreateFundraiserForm {
 export const CreateFundraiser: FunctionComponent = () => {
    const [isLoadingOpen, setIsLoadingOpen] = useState<boolean>(false);
    const [categoryDropdownValue, setCategoryDropdownValue] = useState<string>("0");
+
+   const navigate = useNavigate();
    const toast = useToast();
 
    const authContext = useContext(AuthContext);
@@ -74,7 +77,8 @@ export const CreateFundraiser: FunctionComponent = () => {
       });
 
       if (response.responseType === "success") {
-         // Redirect to fundraiser detail
+         // Redirect to fundraiser detail.
+         navigate(`fundraiser/${response.fundraiserID}`);
       }
    }
 

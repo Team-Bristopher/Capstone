@@ -33,6 +33,19 @@ namespace capstone_api.BusinessLogic
         /// <param name="page">The current page, used for pagination.</param>
         /// <returns>The list of fundraisers.</returns>
         public IEnumerable<FundraiserMessage> GetFundraisers(int page);
+
+        /// <summary>
+        /// Gets the fundraiser information by fundraiser ID.
+        /// </summary>
+        /// <param name="fundraiserID">The ID of the fundraiser to get.</param>
+        /// <returns>The fundraiser message.</returns>
+        public FundraiserMessage GetFundraiserDetail(Guid fundraiserID);
+
+        /// <summary>
+        /// Submits a view for a fundraiser.
+        /// </summary>
+        /// <param name="fundraiserID">The ID of the fundraiser to submit a view for.</param>
+        public void AddFundraiserView(Guid fundraiserID);
     }
 
     /// <inheritdoc />
@@ -119,14 +132,17 @@ namespace capstone_api.BusinessLogic
         /// <inheritdoc />
         public IEnumerable<FundraiserMessage> GetFundraisers(int page)
         {
+            // Grabbing the fundraiser page.
             List<Fundraiser> fundraisers = _fundraiserDataAccess.GetFundraisers(page);
 
+            // For every fundraiser found,
+            // return as a message object.
             return fundraisers.Select(a => new FundraiserMessage
             {
                 ID = a.ID,
                 Title = a.Title,
                 Description = a.Description,
-                Views = a.Views,
+                Views = _fundraiserDataAccess.GetFundraiserViews(a.ID),
                 CreatedOn = a.CreatedOn,
                 ModifiedOn = a.ModifiedOn,
                 CreatedBy = a.CreatedByUserID,
@@ -134,6 +150,81 @@ namespace capstone_api.BusinessLogic
                 Target = a.Target,
                 EndDate = a.EndDate,
             });
+        }
+
+        /// <inheritdoc />
+        public FundraiserMessage GetFundraiserDetail(Guid fundraiserID)
+        {
+            // Getting the fundraiser information by ID.
+            Fundraiser? fundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
+
+            // If the fundraiser lookup by ID wasn't found.
+            if (fundraiser == null)
+            {
+                _logger.LogError($"Fundraiser detail request failed due to fundraiser not found, fundraiser ID [{fundraiserID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.NotFound);
+            }
+
+            // Returning the fundraiser message object.
+            return new FundraiserMessage
+            {
+                ID = fundraiser.ID,
+                Title = fundraiser.Title,
+                Description = fundraiser.Description,
+                Views = _fundraiserDataAccess.GetFundraiserViews(fundraiser.ID),
+                CreatedOn = fundraiser.CreatedOn,
+                ModifiedOn = fundraiser.ModifiedOn,
+                CreatedBy = fundraiser.CreatedByUserID,
+                Type = (int)fundraiser.Type.Type,
+                Target = fundraiser.Target,
+                EndDate = fundraiser.EndDate,
+                Author = new UserMessage
+                {
+                    FirstName = fundraiser.CreatedByUser.FirstName,
+                    LastName = fundraiser.CreatedByUser.LastName,
+                },
+            };
+        }
+
+        /// <inheritdoc />
+        public void AddFundraiserView(Guid fundraiserID)
+        {
+            Claim? userIDClaim = _httpContext.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "ID");
+
+            // If the user claim is not found, or otherwise it doesn't exist.
+            if (userIDClaim == null)
+            {
+                _logger.LogError($"Unable to find the user ID claim for request");
+
+                throw new HttpResponseException((int)HttpStatusCode.Unauthorized);
+            }
+
+            // Getting the ID of the user from the claim.
+            Guid userID = Guid.Parse(userIDClaim.Value);
+
+            // Getting the user by ID.
+            User? matchedUser = _authBusinessLogic.GetUserByID(userID);
+
+            // If the user doesn't exist.
+            if (matchedUser == null)
+            {
+                _logger.LogError($"Authenticated user with claim doesn't exist in database, user ID is [{userID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.Forbidden);
+            }
+
+            // Getting the fundraiser by the supplied fundraiser ID.
+            Fundraiser? matchedFundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
+
+            if (matchedFundraiser == null)
+            {
+                _logger.LogError($"Fundraiser view submit failed due to fundraiser not found, fundraiser ID [{fundraiserID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.NotFound);
+            }
+
+            _fundraiserDataAccess.AddFundraiserView(fundraiserID, matchedUser.ID);
         }
     }
 }

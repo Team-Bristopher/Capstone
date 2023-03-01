@@ -1,3 +1,7 @@
+export interface UserMessage {
+   firstName: string;
+   lastName: string;
+}
 
 export interface Fundraiser {
    id: string;
@@ -10,4 +14,5 @@ export interface Fundraiser {
    modifiedOn: Date;
    createdBy: string;
    endDate: Date;
+   author: UserMessage;
 }

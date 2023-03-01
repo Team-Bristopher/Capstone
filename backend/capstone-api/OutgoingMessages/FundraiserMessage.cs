@@ -39,6 +39,11 @@ namespace capstone_api.OutgoingMessages
 		public double Target { get; set; }
 
 		/// <summary>
+		/// The author of this fundraiser.
+		/// </summary>
+		public UserMessage Author { get; set; }
+
+		/// <summary>
 		/// The time the fundraiser was created on.
 		/// </summary>
 		public DateTime CreatedOn { get; set; }

@@ -25,6 +25,14 @@ namespace capstone_api.Controllers
 			_fundraiserBusinessLogic = fundraiserBusinessLogic;
 		}
 
+		/// <summary>
+		/// Gets the total amount donated to a fundraiser, by fundraiser ID.
+		/// </summary>
+		/// <param name="fundraiserID">The ID of the fundraiser.</param>
+		/// <returns>
+		///	Status "NotFound" if the fundraiser wasn't found by lookup.
+		/// Status "Ok" if the operation finished successfully.
+		/// </returns>
 		[HttpGet("donation-amount")]
 		[AllowAnonymous]
 		public IActionResult GetDonationAmount(
@@ -53,6 +61,26 @@ namespace capstone_api.Controllers
 			IEnumerable<FundraiserMessage> fundraisers = _fundraiserBusinessLogic.GetFundraisers(page);
 
 			return Ok(fundraisers);
+		}
+
+		[HttpGet("detail")]
+		[AllowAnonymous]
+		public IActionResult GetFundraiserDetail(
+			[FromQuery] Guid fundraiserID)
+		{
+			FundraiserMessage message = _fundraiserBusinessLogic.GetFundraiserDetail(fundraiserID);
+
+			return Ok(message);
+		}
+
+		[HttpPost("view")]
+        [Authorize(Policy = "RegisteredUser")]
+		public IActionResult AddFundraiserView(
+			[FromQuery] Guid fundraiserID)
+		{
+			_fundraiserBusinessLogic.AddFundraiserView(fundraiserID);
+
+			return Ok();
 		}
     }
 }

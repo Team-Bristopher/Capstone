@@ -40,6 +40,20 @@ namespace capstone_api.DataAccessLayer
 		/// <param name="page">The current page, used for pagination.</param>
 		/// <returns>The list of fundraisers.</returns>
 		public List<Fundraiser> GetFundraisers(int page);
+
+        /// <summary>
+        /// Submits a view for a fundraiser.
+        /// </summary>
+        /// <param name="fundraiserID">The ID of the fundraiser to submit a view for.</param>
+        /// <param name="userID">The ID of the user.</param>
+        public void AddFundraiserView(Guid fundraiserID, Guid userID);
+
+		/// <summary>
+		/// Gets the total number of unique fundraiser views.
+		/// </summary>
+		/// <param name="fundraiserID">The ID of the fundraiser.</param>
+		/// <returns>The amount of total unique fundraiser views.</returns>
+		public long GetFundraiserViews(Guid fundraiserID);
 	}
 
 	/// <inheritdoc />
@@ -74,6 +88,8 @@ namespace capstone_api.DataAccessLayer
 		{
 			return _databaseContext.Fundraisers
 				.Where(a => a.ID.Equals(fundraiserID))
+				.Include(a => a.CreatedByUser)
+				.Include(a => a.Type)
 				.FirstOrDefault();
 		}
 
@@ -118,6 +134,44 @@ namespace capstone_api.DataAccessLayer
                 .Take(6)
 				.OrderBy(a => a.CreatedOn)
 				.ToList();
+		}
+
+		/// <inheritdoc />
+        public void AddFundraiserView(Guid fundraiserID, Guid userID)
+		{
+			FundraiserView? existingView = _databaseContext.FundraiserViews
+				.Where(a => a.ViewedByID.Equals(userID))
+				.Where(a => a.FundraiserID.Equals(fundraiserID))
+				.FirstOrDefault();
+
+			// If no view was found for the particular
+			// fundraiser from the particular person.
+			if (existingView == null)
+			{
+				FundraiserView view = new FundraiserView()
+				{
+					ID = Guid.NewGuid(),
+					ViewedByID = userID,
+					FundraiserID = fundraiserID,
+					ViewedOn = DateTime.UtcNow
+				};
+
+				_databaseContext.Add(view);
+			}
+			else
+			{
+				existingView.ViewedOn = DateTime.UtcNow;
+            }
+
+            _databaseContext.SaveChanges();
+        }
+
+        /// <inheritdoc />
+        public long GetFundraiserViews(Guid fundraiserID)
+		{
+			return _databaseContext.FundraiserViews
+					.Where(a => a.FundraiserID.Equals(fundraiserID))
+					.Count();
 		}
     }
 }

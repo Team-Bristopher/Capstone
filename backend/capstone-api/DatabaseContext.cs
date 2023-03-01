@@ -52,6 +52,11 @@ namespace capstone_api
         public DbSet<FundraiserType> FundraiserType { get; set; }
 
         /// <summary>
+        /// The FundraiserViews database context.
+        /// </summary>
+        public DbSet<FundraiserView> FundraiserViews { get; set; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
@@ -134,6 +139,14 @@ namespace capstone_api
 
                 entity.HasMany(e => e.Donations).WithOne(e => e.DonatedBy);
                 entity.HasMany(e => e.CreatedFundraisers).WithOne(e => e.CreatedByUser);
+            });
+
+            modelBuilder.Entity<FundraiserView>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+
+                entity.HasOne(e => e.ViewedFundraiser).WithMany(e => e.Views);
+                entity.HasOne(e => e.ViewedByUser).WithMany(e => e.ViewedFundraisers);
             });
 
             // Seeding anonymous user.

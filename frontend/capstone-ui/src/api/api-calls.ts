@@ -214,3 +214,26 @@ export const getFundraisers = (page: number): Promise<Array<Fundraiser>> => {
       }
     })
 }
+
+export const getFundraiserDetail = (fundraiserID: string): Promise<Fundraiser | undefined> => {
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/detail?fundraiserID=${fundraiserID}`)
+    .then(async (resp) => {
+      switch (resp.status) {
+        case 200:
+          return await resp.json();
+        default:
+          return undefined;
+      }
+    })
+}
+
+export const viewFundraiser = (fundraiserID: string) => {
+  const authorization = localStorage.getItem("accessToken");
+
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/view?fundraiserID=${fundraiserID}`, {
+    headers: {
+      "Authorization": "Bearer " + (authorization || ""),
+    },
+    method: "POST",
+  });
+}
