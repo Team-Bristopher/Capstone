@@ -1,4 +1,5 @@
 import { CreateFundraiserResponseMessage, CreateFundraiserResponseMessageRaw } from "../models/incoming/CreateFundraiserResponseMessage";
+import { DonateToFundraiserResponse } from "../models/incoming/DonateToFundraiserResponse";
 import { EditUserMessageResponse } from "../models/incoming/EditUserMessageResponse";
 import { Fundraiser } from "../models/incoming/Fundraiser";
 import { FundraiserDonationAmountMessage } from "../models/incoming/FundraiserDonationAmountMessage";
@@ -7,6 +8,7 @@ import { LoggedInUserResponse } from "../models/incoming/LoggedInUserResponse";
 import { MyUserResponse } from "../models/incoming/MyUserResponse";
 import { RegisterUserResponse } from "../models/incoming/RegisterUserResponse";
 import { CreateFundraiserMessage } from "../models/outgoing/CreateFundraiserMessage";
+import { DonateToFundraiserMessage } from "../models/outgoing/DonateToFundraiserMessage";
 import { EditUserMessage } from "../models/outgoing/EditUserMessage";
 import { LoginUserMessage } from "../models/outgoing/LoginUserMessage";
 import { RegisterUserMessage } from "../models/outgoing/RegisterUserMessage";
@@ -236,4 +238,31 @@ export const viewFundraiser = (fundraiserID: string) => {
     },
     method: "POST",
   });
+}
+
+export const donateToFundraiser = (message: DonateToFundraiserMessage): Promise<DonateToFundraiserResponse> => {
+  const authorization = localStorage.getItem("accessToken");
+
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/donate`, {
+    headers: {
+      "Authorization": "Bearer " + (authorization || ""),
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(message),
+  })
+    .then((response) => {
+      switch (response.status) {
+        case 200:
+          return {
+            message: "Thank you for your donation!",
+            responseType: "success",
+          } as DonateToFundraiserResponse
+        default:
+          return {
+            message: "An unknown error has occured",
+            responseType: "error",
+          } as DonateToFundraiserResponse
+      }
+    });
 }

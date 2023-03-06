@@ -54,6 +54,14 @@ namespace capstone_api.DataAccessLayer
 		/// <param name="fundraiserID">The ID of the fundraiser.</param>
 		/// <returns>The amount of total unique fundraiser views.</returns>
 		public long GetFundraiserViews(Guid fundraiserID);
+
+		/// <summary>
+		/// Donates to a fundraiser.
+		/// </summary>
+		/// <param name="fundraiser">The fundraiser.</param>
+		/// <param name="user">The user donating.</param>
+		/// <param name="amount">The amount to be donated.</param>
+		public void DonateToFundraiser(Fundraiser fundraiser, User user, double amount);
 	}
 
 	/// <inheritdoc />
@@ -172,6 +180,22 @@ namespace capstone_api.DataAccessLayer
 			return _databaseContext.FundraiserViews
 					.Where(a => a.FundraiserID.Equals(fundraiserID))
 					.Count();
+		}
+
+		/// <inheritdoc />
+        public void DonateToFundraiser(Fundraiser fundraiser, User user, double amount)
+		{
+			Donation donation = new Donation()
+			{
+				ID = Guid.NewGuid(),
+				DonatedBy = user,
+				Fundraiser = fundraiser,
+				Amount = amount,
+			};
+
+			_databaseContext.Add(donation);
+
+			_databaseContext.SaveChanges();
 		}
     }
 }

@@ -197,7 +197,7 @@ export const Login: FunctionComponent = () => {
                         color="#D90429"
                         marginLeft="0.5em"
                         fontWeight="bold"
-                        fontSize="0.8em"
+                        fontSize="0.9em"
                      >
                         Forgot password?
                      </Text>

@@ -49,6 +49,12 @@ namespace capstone_api.BusinessLogic
 		/// </summary>
 		/// <returns>A message containing the logged in user.</returns>
 		public MyUserMessage GetMyUser();
+
+		/// <summary>
+		/// Gets the anonymous user account.
+		/// </summary>
+		/// <returns>The anonymous user account.</returns>
+		public User GetAnonymousUser();
     }
 
 	/// <inheritdoc />
@@ -213,6 +219,12 @@ namespace capstone_api.BusinessLogic
         public User? GetUserByID(Guid userID)
 		{
 			return _authDataAccess.GetUserByID(userID);
+		}
+
+		/// <inheritdoc />
+		public User GetAnonymousUser()
+		{
+			return _authDataAccess.GetUserByID(Guid.Empty)!;
 		}
     }
 }

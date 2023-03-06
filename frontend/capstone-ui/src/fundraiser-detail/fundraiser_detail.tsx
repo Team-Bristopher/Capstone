@@ -66,6 +66,10 @@ export const FundraiserDetail: FunctionComponent = () => {
       setIsLoading(false);
    }
 
+   const getFundraiserDonationCalculation = (): string => {
+      return ((donatedAmount / (fundraiserDetail?.target ?? 1)) * 100).toFixed(1);
+   }
+
    useEffect(() => {
       setIsLoading(true);
 
@@ -432,12 +436,12 @@ export const FundraiserDetail: FunctionComponent = () => {
                         fontWeight="bold"
                         marginRight="0.3em"
                      >
-                        {((donatedAmount / (fundraiserDetail?.target ?? 1)) * 100)}%
+                        {getFundraiserDonationCalculation()}%
                      </Text>
                      <Progress
                         width="90%"
                         minHeight="1.7em"
-                        value={isLoading ? undefined : ((donatedAmount / (fundraiserDetail?.target ?? 1)) * 100)}
+                        value={isLoading ? undefined : Number(getFundraiserDonationCalculation())}
                         isAnimated={true}
                         hasStripe={true}
                         isIndeterminate={isLoading}
