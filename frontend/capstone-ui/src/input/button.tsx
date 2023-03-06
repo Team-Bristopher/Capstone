@@ -80,7 +80,7 @@ export const Button: FunctionComponent<ButtonProps> = (props: ButtonProps) => {
                      as={props.icon}
                      justifySelf="start"
                      width="20%"
-                     marginLeft="0"
+                     marginLeft="0.2em"
                   />
                   <Text
                      width="80%"

@@ -46,6 +46,12 @@ namespace capstone_api.BusinessLogic
         /// </summary>
         /// <param name="fundraiserID">The ID of the fundraiser to submit a view for.</param>
         public void AddFundraiserView(Guid fundraiserID);
+
+        /// <summary>
+        /// Donates to a fundraiser.
+        /// </summary>
+        /// <param name="message">Information about the donation.</param>
+        public void DonateToFundraiser(DonateToFundraiserMessage message);
     }
 
     /// <inheritdoc />
@@ -225,6 +231,49 @@ namespace capstone_api.BusinessLogic
             }
 
             _fundraiserDataAccess.AddFundraiserView(fundraiserID, matchedUser.ID);
+        }
+
+        /// <inheritdoc />
+        public void DonateToFundraiser(DonateToFundraiserMessage message)
+        {
+            Claim? userIDClaim = _httpContext.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "ID");
+
+            User? matchedUser = null;
+
+            // If the user claim is not found, or otherwise it doesn't exist.
+            if (userIDClaim != null)
+            {
+                // Getting the ID of the user from the claim.
+                Guid userID = Guid.Parse(userIDClaim.Value);
+
+                // Getting the user by ID.
+                matchedUser = _authBusinessLogic.GetUserByID(userID);
+
+                // If the user doesn't exist.
+                if (matchedUser == null)
+                {
+                    _logger.LogError($"Authenticated user with claim doesn't exist in database, user ID is [{userID}]");
+
+                    throw new HttpResponseException((int)HttpStatusCode.Forbidden);
+                }
+            } else
+            {
+                matchedUser = _authBusinessLogic.GetAnonymousUser();
+            }
+
+            // Ensuring the fundraiser exists.
+            Fundraiser? matchedFundraiser = _fundraiserDataAccess.GetFundraiser(message.FundraiserID);
+
+            // If the fundraiser does not exist in our
+            // database.
+            if (matchedFundraiser == null)
+            {
+                _logger.LogError($"Unable to donate to fundraiser [{message.FundraiserID}] due to fundraiser not existing.");
+
+                throw new HttpResponseException((int)HttpStatusCode.NotFound);
+            }
+
+            _fundraiserDataAccess.DonateToFundraiser(matchedFundraiser, matchedUser, message.Amount);
         }
     }
 }

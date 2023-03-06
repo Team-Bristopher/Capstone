@@ -82,6 +82,16 @@ namespace capstone_api.Controllers
 
 			return Ok();
 		}
+
+		[HttpPost("donate")]
+		[AllowAnonymous]
+		public IActionResult DonateToFundraiser(
+			DonateToFundraiserMessage message)
+		{
+			_fundraiserBusinessLogic.DonateToFundraiser(message);
+
+			return Ok();
+		}
     }
 }
 

@@ -153,6 +153,10 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                {...props.formInfo?.registerFn(props.formInfo?.name || '', props.formInfo?.registerOptions)}
                {...props.style}
                placeholder={props.placeholder}
+               _placeholder={{
+                  fontWeight: "bold",
+                  color: "#D9D9D9",
+               }}
             />
             {hasError() &&
                <Popover placement="top" trigger="hover">

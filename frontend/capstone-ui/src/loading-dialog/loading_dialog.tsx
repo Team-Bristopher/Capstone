@@ -28,14 +28,13 @@ export const LoadingDialog: FunctionComponent<LoadingDialogProps> = (props: Load
             isCentered
          >
             <AlertDialogOverlay />
-            <AlertDialogContent backgroundColor="transparent">
+            <AlertDialogContent>
                <AlertDialogBody display="flex" justifyContent="center" padding="2em" flexDir="column" backgroundColor="transparent">
                   <Box
                      width="100%"
                      height="auto"
                      display="flex"
                      justifyContent="center"
-                     backgroundColor="transparent"
                   >
                      <Icon
                         as={GiGreatPyramid}
