@@ -18,8 +18,7 @@ export const Home: FunctionComponent = () => {
       <Page>
         <Container
           display="flex"
-          paddingTop="2em"
-          paddingLeft="8rem"
+          paddingLeft="11.45rem"
           paddingRight="8rem"
           width="100%"
           maxWidth="100%"
@@ -37,12 +36,13 @@ export const Home: FunctionComponent = () => {
           display="flex"
           flexDir="row"
           padding="2em"
-          paddingLeft="8rem"
-          paddingRight="8rem"
+          paddingTop="1em"
+          paddingLeft="7rem"
+          paddingRight="7.85rem"
           width="100%"
           maxWidth="100%"
         >
-          {authContext.loggedInUser !== undefined && (
+          { authContext.loggedInUser !== undefined &&
             <Button
               ariaLabel="Create fundraiser button"
               label="Create Fundraiser"
@@ -53,13 +53,14 @@ export const Home: FunctionComponent = () => {
               }}
               onClick={() => { navigate("fundraiser/create"); }}
             />
-          )}
+          }
           <Box
             margin="0"
             width="100%"
             maxWidth="100%"
             display="flex"
-            marginLeft="1rem"
+            marginLeft="4.55rem"
+            marginRight="2.6rem"
             border="1px solid"
             borderColor="#8D99AE"
             borderRadius="5px"
@@ -74,17 +75,18 @@ export const Home: FunctionComponent = () => {
               _hover={{
                 "cursor": "pointer",
               }}
-              padding="1px"
-              marginLeft="0.3rem"
+              padding="2px"
+              marginLeft="0.1rem"
+              marginRight="-0.5rem"
               marginTop="0.1rem"
             />
             <Input
-              placeholder="Search fundraisers"
+              placeholder="Search for fundraisesrs..."
               aria-label="Fundraiser search bar"
               width="60%"
               border="none"
               height="2rem"
-              marginLeft="0.1rem"
+              marginTop="-0.1rem"
               _focusVisible={{
                 "border": "0",
                 "borderColor": "none",
@@ -96,7 +98,7 @@ export const Home: FunctionComponent = () => {
               color="white"
               backgroundColor="#8D99AE"
               height="2rem"
-              marginRight="0.2rem"
+              marginRight="0.05rem"
               fontWeight="bold"
             >
               <option value=''>All Categories</option>
@@ -116,11 +118,11 @@ export const Home: FunctionComponent = () => {
           display="flex"
           flexDir="row"
           padding="2em"
-          paddingLeft="8rem"
+          paddingLeft="11.55rem"
           paddingRight="8rem"
           width="100%"
           maxWidth="100%"
-          marginTop="2rem"
+          marginTop="-2.5rem"
         >
           <Fundraisers />
         </Container>
