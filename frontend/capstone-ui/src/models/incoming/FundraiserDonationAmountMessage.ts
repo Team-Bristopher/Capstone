@@ -1,3 +1,6 @@
+import { FundraiserDonationMessage } from "./FundraiserDonationMessage";
+
 export interface FundraiserDonationAmountMessage {
-   amount: number;
+   totalAmount: number;
+   recentDonations: Array<FundraiserDonationMessage>;
 }

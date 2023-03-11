@@ -3,6 +3,7 @@ import { DonateToFundraiserResponse } from "../models/incoming/DonateToFundraise
 import { EditUserMessageResponse } from "../models/incoming/EditUserMessageResponse";
 import { Fundraiser } from "../models/incoming/Fundraiser";
 import { FundraiserDonationAmountMessage } from "../models/incoming/FundraiserDonationAmountMessage";
+import { FundraiserDonationMessage } from "../models/incoming/FundraiserDonationMessage";
 import { HealthcheckMessage } from "../models/incoming/HealthcheckResponse";
 import { LoggedInUserResponse } from "../models/incoming/LoggedInUserResponse";
 import { MyUserResponse } from "../models/incoming/MyUserResponse";
@@ -12,6 +13,7 @@ import { DonateToFundraiserMessage } from "../models/outgoing/DonateToFundraiser
 import { EditUserMessage } from "../models/outgoing/EditUserMessage";
 import { LoginUserMessage } from "../models/outgoing/LoginUserMessage";
 import { RegisterUserMessage } from "../models/outgoing/RegisterUserMessage";
+import { DonationTimeSort } from "../recent-donations/recent_donations";
 
 export const getApiStatus = (): Promise<HealthcheckMessage | undefined> => {
   const authorization = localStorage.getItem("accessToken");
@@ -160,15 +162,16 @@ export const editUserData = (message: EditUserMessage): Promise<EditUserMessageR
     });
 }
 
-export const getFundraiserAmount = (fundraiserID: string): Promise<FundraiserDonationAmountMessage | undefined> => {
-  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/donation-amount?fundraiserID=${fundraiserID}`)
+export const getFundraiserAmount = (donationTimeSort: DonationTimeSort, fundraiserID: string): Promise<FundraiserDonationAmountMessage | undefined> => {
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/donation-amount?fundraiserID=${fundraiserID}&timeSortOption=${donationTimeSort}`)
     .then(async (resp) => {
       switch (resp.status) {
         case 200:
           return await resp.json() as FundraiserDonationAmountMessage;
         default:
           return {
-            amount: 0,
+            totalAmount: 0,
+            recentDonations: [],
           } as FundraiserDonationAmountMessage
       }
     })
@@ -265,4 +268,16 @@ export const donateToFundraiser = (message: DonateToFundraiserMessage): Promise<
           } as DonateToFundraiserResponse
       }
     });
+}
+
+export const getAllDonations = (fundraiserID: string, page: number): Promise<Array<FundraiserDonationMessage>> => {
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/donations?fundraiserID=${fundraiserID}&page=${page}`)
+    .then((resp) => {
+      switch (resp.status) {
+        case 200:
+          return resp.json()
+        default:
+          return []
+      }
+    })
 }

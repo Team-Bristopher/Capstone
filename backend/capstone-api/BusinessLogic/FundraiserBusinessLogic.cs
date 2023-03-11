@@ -3,6 +3,7 @@ using System.Net;
 using System.Security.Claims;
 using capstone_api.DataAccessLayer;
 using capstone_api.IncomingMessages;
+using capstone_api.Models.Constants;
 using capstone_api.Models.DatabaseEntities;
 using capstone_api.OutgoingMessages;
 
@@ -17,8 +18,9 @@ namespace capstone_api.BusinessLogic
         /// Gets the amount donated so far to a fundraiser.
         /// </summary>
         /// <param name="fundraiserID">The unique identifier of the fundraiser.</param>
+        /// <param name="sortOption">The sort option of the donations.</param>
         /// <returns>The amount donated.</returns>
-        public FundraiserDonationAmountMessage GetDonatedAmount(Guid fundraiserID);
+        public FundraiserDonationAmountMessage GetFundraiserDonations(DonationTimeSort sortOption, Guid fundraiserID);
 
 		/// <summary>
 		/// Creates a fundraiser.
@@ -33,6 +35,14 @@ namespace capstone_api.BusinessLogic
         /// <param name="page">The current page, used for pagination.</param>
         /// <returns>The list of fundraisers.</returns>
         public IEnumerable<FundraiserMessage> GetFundraisers(int page);
+
+        /// <summary>
+        /// Gets the donations feed.
+        /// </summary>
+        /// <param name="page">The current page, used for pagination.</param>
+        /// <param name="fundraiserID">The ID of the fundraiser.</param>
+        /// <returns>The list of donations.</returns>
+        public IEnumerable<FundraiserDonationMessage> GetAllDonations(Guid fundraiserID, int page);
 
         /// <summary>
         /// Gets the fundraiser information by fundraiser ID.
@@ -78,7 +88,7 @@ namespace capstone_api.BusinessLogic
 		}
 
 		/// <inheritdoc />
-        public FundraiserDonationAmountMessage GetDonatedAmount(Guid fundraiserID)
+        public FundraiserDonationAmountMessage GetFundraiserDonations(DonationTimeSort sortOption, Guid fundraiserID)
 		{
 			// Ensuring the fundraiser exists based upon the ID.
 			Fundraiser? fundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
@@ -94,10 +104,20 @@ namespace capstone_api.BusinessLogic
 			// Grabbing the total amount of money donated to a fundraiser.
 			double amount = _fundraiserDataAccess.GetDonatedAmount(fundraiserID);
 
-			return new FundraiserDonationAmountMessage
-			{
-				Amount = amount,
-			};
+            // Grabbing the most recent donations to this fundraiser.
+            List<Donation> recentDonations = _fundraiserDataAccess.GetRecentDonations(sortOption, fundraiserID);
+
+            return new FundraiserDonationAmountMessage
+            {
+                TotalAmount = amount,
+                RecentDonations = recentDonations.Select(a => new FundraiserDonationMessage()
+                {
+                    FirstName = a.DonatedBy!.FirstName,
+                    LastName = a.DonatedBy!.LastName,
+                    IndividualAmount = a.Amount,
+                    DonatedAt = a.DonatedOn,
+                }).ToList()
+            };
 		}
 
 		/// <inheritdoc />
@@ -191,6 +211,32 @@ namespace capstone_api.BusinessLogic
                     LastName = fundraiser.CreatedByUser.LastName,
                 },
             };
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<FundraiserDonationMessage> GetAllDonations(Guid fundraiserID, int page)
+        {
+            // Getting the fundraiser information by ID.
+            Fundraiser? fundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
+
+            // If the fundraiser lookup by ID wasn't found.
+            if (fundraiser == null)
+            {
+                _logger.LogError($"Get all donations request failed due to fundraiser not found, fundraiser ID [{fundraiserID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.NotFound);
+            }
+
+            // Getting the current page of donations.
+            List<Donation> currentDonationPage = _fundraiserDataAccess.GetAllDonations(fundraiserID, page);
+
+            return currentDonationPage.Select(a => new FundraiserDonationMessage
+            {
+                FirstName = a.DonatedBy!.FirstName,
+                LastName = a.DonatedBy!.LastName,
+                IndividualAmount = a.Amount,
+                DonatedAt = a.DonatedOn,
+            });
         }
 
         /// <inheritdoc />

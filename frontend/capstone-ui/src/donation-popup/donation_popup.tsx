@@ -1,10 +1,11 @@
 import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Checkbox, Container, IconButton, Text } from "@chakra-ui/react";
-import { FunctionComponent, useRef } from "react";
+import { FunctionComponent, useContext, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { BiLogIn } from "react-icons/bi";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { VscClose } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
+import { FundraiserContext } from "../fundraiser-detail/fundraiser_detail";
 import { DONATION_MESSAGE_TOO_LONG, DONATION_TOO_SMALL_ERROR, REQUIRED_FIELD_ERROR } from "../globals/form_globals";
 import { Button } from "../input/button";
 import { NumberInput } from "../input/numberinput";
@@ -23,8 +24,6 @@ interface DonationPopupForm {
 }
 
 export interface DonationPopupProps {
-   fundraiserTitle: string;
-   fundraiserID: string;
    onClose: () => void;
 }
 
@@ -38,6 +37,8 @@ export const DonationPopup: FunctionComponent<DonationPopupProps> = (props: Dona
       reValidateMode: "onSubmit",
    });
 
+   const fundraiser = useContext(FundraiserContext);
+
    const onSubmit = () => {
       const values = getValues();
 
@@ -46,8 +47,8 @@ export const DonationPopup: FunctionComponent<DonationPopupProps> = (props: Dona
             isAnonymous: values.anonymousDonation,
             donationAmount: values.amount,
             donationMessage: values.message,
-            fundraiserTitle: props.fundraiserTitle,
-            fundraiserID: props.fundraiserID,
+            fundraiserTitle: fundraiser?.fundraiser.title ?? "",
+            fundraiserID: fundraiser?.fundraiser.id ?? "",
          }
       });
    }
@@ -78,7 +79,7 @@ export const DonationPopup: FunctionComponent<DonationPopupProps> = (props: Dona
                   <Text
                      width="75%"
                   >
-                     Donate to {props.fundraiserTitle}
+                     Donate to {fundraiser?.fundraiser.title ?? ""}
                   </Text>
                   <IconButton
                      icon={<VscClose />}

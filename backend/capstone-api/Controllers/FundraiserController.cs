@@ -1,6 +1,7 @@
 ﻿using System;
 using capstone_api.BusinessLogic;
 using capstone_api.IncomingMessages;
+using capstone_api.Models.Constants;
 using capstone_api.OutgoingMessages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,9 +37,10 @@ namespace capstone_api.Controllers
 		[HttpGet("donation-amount")]
 		[AllowAnonymous]
 		public IActionResult GetDonationAmount(
-			[FromQuery] Guid fundraiserID)
+			[FromQuery] Guid fundraiserID,
+			[FromQuery] int timeSortOption)
 		{
-			FundraiserDonationAmountMessage message = _fundraiserBusinessLogic.GetDonatedAmount(fundraiserID);
+			FundraiserDonationAmountMessage message = _fundraiserBusinessLogic.GetFundraiserDonations((DonationTimeSort)timeSortOption, fundraiserID);
 
 			return Ok(message);
 		}
@@ -91,6 +93,17 @@ namespace capstone_api.Controllers
 			_fundraiserBusinessLogic.DonateToFundraiser(message);
 
 			return Ok();
+		}
+
+		[HttpGet("donations")]
+		[AllowAnonymous]
+		public IActionResult GetAllDonations(
+			[FromQuery] Guid fundraiserID,
+			[FromQuery] int page)
+		{
+			IEnumerable<FundraiserDonationMessage> donationMessages = _fundraiserBusinessLogic.GetAllDonations(fundraiserID, page);
+
+			return Ok(donationMessages);
 		}
     }
 }
