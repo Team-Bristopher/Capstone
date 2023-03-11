@@ -14,11 +14,11 @@ import { FundraiserDonationMessage } from "../models/incoming/FundraiserDonation
 import { Page } from "../page/page";
 import { DonationTimeSort, RecentDonations } from "../recent-donations/recent_donations";
 
-export interface FundraiserContext {
+export interface FundraiserContextProps {
    fundraiser: Fundraiser;
 }
 
-export const FundraiserContext = createContext<FundraiserContext | undefined>(undefined);
+export const FundraiserContext = createContext<FundraiserContextProps | undefined>(undefined);
 
 export const FundraiserDetail: FunctionComponent = () => {
    const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -28,7 +28,7 @@ export const FundraiserDetail: FunctionComponent = () => {
    const [isDonationDialogOpen, setIsDonationDialogOpen] = useState<boolean>(false);
    const [donationTimeSort, setDonationTimeSort] = useState<DonationTimeSort>(DonationTimeSort.OLDEST);
 
-   const fundraiserContext = useRef<FundraiserContext | undefined>(undefined);
+   const fundraiserContext = useRef<FundraiserContextProps | undefined>(undefined);
 
    const authContext = useContext(AuthContext);
 
@@ -490,7 +490,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                         backgroundColor="#D9D9D9"
                         height="0.1em"
                      />
-                     {donatedAmount == 0 ? (
+                     {donatedAmount === 0 ? (
                         <HStack
                            maxW="100%"
                            w="100%"

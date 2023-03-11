@@ -25,7 +25,7 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
       // eslint-disable-next-line
    }, [props]);
 
-   const { data, isFetching, refetch } = useInfiniteQuery<FundraiserDonationMessage[]>({
+   const { data, isFetching } = useInfiniteQuery<FundraiserDonationMessage[]>({
       queryKey: ["all-donations"],
       queryFn: fetchAllDonations,
       refetchOnWindowFocus: false,
