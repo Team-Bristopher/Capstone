@@ -91,7 +91,7 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
             width="100%"
             justifyContent="space-between"
          >
-            {(data?.pages || []).map((fundraiserPage, idx) => (
+            {(data?.pages || []).map((fundraiserPage) => (
                <>
                   {(fundraiserPage.map((fundraiser: Fundraiser) => (
                      <>

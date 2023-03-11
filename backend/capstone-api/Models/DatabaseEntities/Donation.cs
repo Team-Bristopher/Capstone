@@ -49,6 +49,12 @@ namespace capstone_api.Models.DatabaseEntities
         public User? DonatedBy { get; set; }
 
         /// <summary>
+        /// The DateTime the donation was posted.
+        /// </summary>
+        [Required]
+        public DateTime DonatedOn { get; set; }
+
+        /// <summary>
         /// The amount that was donated.
         /// </summary>
         [Required]

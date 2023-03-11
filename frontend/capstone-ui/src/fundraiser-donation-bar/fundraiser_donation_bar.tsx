@@ -1,6 +1,7 @@
 import { Box, Container, Progress, Text } from "@chakra-ui/react";
 import { FunctionComponent, useEffect, useState } from "react";
 import { getFundraiserAmount } from "../api/api-calls";
+import { DonationTimeSort } from "../recent-donations/recent_donations";
 
 interface FundraiserDonationBarProps {
    fundraiserID: string;
@@ -15,13 +16,13 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
    const sendGetAmountRequest = async () => {
       setIsLoading(true);
 
-      const response = await getFundraiserAmount(props.fundraiserID);
+      const response = await getFundraiserAmount(DonationTimeSort.LATEST, props.fundraiserID);
 
       if (response === undefined) {
          return;
       }
 
-      setDonatedAmount(response.amount);
+      setDonatedAmount(response.totalAmount);
       setIsLoading(false);
    }
 
@@ -51,16 +52,8 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
                alignContent="center"
                flexWrap="wrap"
             >
-               <Text
-                  color="#2B2D42"
-                  fontSize="1.2em"
-                  fontWeight="bold"
-                  marginRight="0.3em"
-               >
-                  {((donatedAmount / props.fundraiserGoal) * 100)}%
-               </Text>
                <Progress
-                  width="90%"
+                  width="100%"
                   minHeight="1.7em"
                   value={isLoading ? undefined : ((donatedAmount / props.fundraiserGoal) * 100)}
                   isAnimated={true}

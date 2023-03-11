@@ -9,10 +9,15 @@ namespace capstone_api.OutgoingMessages
 	public class FundraiserDonationAmountMessage
 	{
 		/// <summary>
-		/// The amount that has been donated to a particular
-		/// fundraiser.
+		/// The total amount that has been donated
+		/// to a particular fundraiser.
 		/// </summary>
-		public double Amount { get; set; }
+		public double TotalAmount { get; set; }
+
+		/// <summary>
+		/// The last 10 most recent donations for this fundraiser.
+		/// </summary>
+		public List<FundraiserDonationMessage> RecentDonations { get; set; } = new List<FundraiserDonationMessage>();
 	}
 }
 

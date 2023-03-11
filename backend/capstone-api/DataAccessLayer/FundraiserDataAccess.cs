@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using capstone_api.IncomingMessages;
+using capstone_api.Models.Constants;
 using capstone_api.Models.DatabaseEntities;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,6 +43,14 @@ namespace capstone_api.DataAccessLayer
 		public List<Fundraiser> GetFundraisers(int page);
 
         /// <summary>
+        /// Gets the donations feed.
+        /// </summary>
+        /// <param name="page">The current page, used for pagination.</param>
+		/// <param name="fundraiserID">The ID of the fundraiser.</param>
+        /// <returns>The list of donations.</returns>
+        public List<Donation> GetAllDonations(Guid fundraiserID, int page);
+
+        /// <summary>
         /// Submits a view for a fundraiser.
         /// </summary>
         /// <param name="fundraiserID">The ID of the fundraiser to submit a view for.</param>
@@ -62,6 +71,14 @@ namespace capstone_api.DataAccessLayer
 		/// <param name="user">The user donating.</param>
 		/// <param name="amount">The amount to be donated.</param>
 		public void DonateToFundraiser(Fundraiser fundraiser, User user, double amount);
+
+		/// <summary>
+		/// Returns the last 6 most recent donations to a fundraiser.
+		/// </summary>
+		/// <param name="fundraiserID">The unique identifier of the fundraiser.</param>
+		/// <param name="sortOption">The sort option of the donations.</param>
+		/// <returns>The last 6 most recent donations, by date/time.</returns>
+		public List<Donation> GetRecentDonations(DonationTimeSort sortOption, Guid fundraiserID);
 	}
 
 	/// <inheritdoc />
@@ -145,6 +162,17 @@ namespace capstone_api.DataAccessLayer
 		}
 
 		/// <inheritdoc />
+        public List<Donation> GetAllDonations(Guid fundraiser, int page)
+		{
+			return _databaseContext.Donations
+                .Include(a => a.DonatedBy)
+                .Skip(page * 6)
+                .Take(6)
+                .OrderBy(a => a.DonatedOn)
+                .ToList();
+        }
+
+        /// <inheritdoc />
         public void AddFundraiserView(Guid fundraiserID, Guid userID)
 		{
 			FundraiserView? existingView = _databaseContext.FundraiserViews
@@ -191,11 +219,33 @@ namespace capstone_api.DataAccessLayer
 				DonatedBy = user,
 				Fundraiser = fundraiser,
 				Amount = amount,
+				DonatedOn = DateTime.UtcNow,
 			};
 
 			_databaseContext.Add(donation);
 
 			_databaseContext.SaveChanges();
 		}
-    }
+
+		/// <inheritdoc />
+        public List<Donation> GetRecentDonations(DonationTimeSort sortOption, Guid fundraiserID)
+		{
+			if (sortOption == DonationTimeSort.LATEST)
+			{
+				return _databaseContext.Donations
+					.Where(a => a.FundraiserID.Equals(fundraiserID))
+					.Include(a => a.DonatedBy)
+					.OrderBy(a => a.DonatedOn)
+					.Take(6)
+					.ToList();
+            }
+
+			return _databaseContext.Donations
+				.Where(a => a.FundraiserID.Equals(fundraiserID))
+				.Include(a => a.DonatedBy)
+				.OrderByDescending(a => a.DonatedOn)
+				.Take(6)
+				.ToList();
+        }
+	}
 }
