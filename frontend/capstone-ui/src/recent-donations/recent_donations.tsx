@@ -35,8 +35,9 @@ export const RecentDonations: FunctionComponent<RecentDonationsProps> = (props: 
          <VStack
             divider={<StackDivider borderColor='gray.200' />}
             spacing={1}
-            align='stretch'
-            maxH="80vh"
+            align="stretch"
+            height="32em"
+            maxHeight="32em"
             overflow="hidden"
          >
             {props.recentDonations.map((donation) => (

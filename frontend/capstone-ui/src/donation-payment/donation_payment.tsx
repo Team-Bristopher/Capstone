@@ -48,6 +48,7 @@ export const DonationPayment: FunctionComponent = () => {
 
       const message: DonateToFundraiserMessage = {
          fundraiserID: location.state.fundraiserID,
+         message: location.state.donationMessage,
          amount: location.state.donationAmount,
          userID: authContext.loggedInUser?.ID === "" ? undefined : authContext.loggedInUser?.ID,
          isSavingPaymentInformation: false, // TODO

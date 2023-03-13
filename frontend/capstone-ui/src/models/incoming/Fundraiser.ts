@@ -15,4 +15,5 @@ export interface Fundraiser {
    createdBy: string;
    endDate: Date;
    author: UserMessage;
+   commentCount: number;
 }

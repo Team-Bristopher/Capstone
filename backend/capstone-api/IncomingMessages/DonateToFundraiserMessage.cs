@@ -30,6 +30,12 @@ namespace capstone_api.IncomingMessages
 		/// </summary>
 		public bool IsSavingPaymentInformation { get; set; } = false;
 
+        /// <summary>
+        /// Nullable, default is empty.
+        /// The donation message.
+        /// </summary>
+        public string Message { get; set; } = string.Empty;
+
 		/// <summary>
 		/// The first name of the card.
 		/// </summary>

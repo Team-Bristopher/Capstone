@@ -79,12 +79,6 @@ namespace capstone_api.Models.DatabaseEntities
         public User? CreatedByUser { get; set; }
 
         /// <summary>
-        /// The Comments tied to this Fundraiser.
-        /// </summary>
-        [Required]
-        public List<Comment> Comments { get; set; } = new List<Comment>();
-
-        /// <summary>
         /// The Donatins tied to this Fundraiser.
         /// </summary>
         [Required]

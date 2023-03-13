@@ -62,6 +62,11 @@ namespace capstone_api.OutgoingMessages
 		/// The ID of the user that created the fundraiser.
 		/// </summary>
 		public Guid CreatedBy { get; set; }
+
+		/// <summary>
+		/// The amount of comments this fundraiser has.
+		/// </summary>
+		public long CommentCount { get; set; }
 	}
 }
 

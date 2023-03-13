@@ -1,5 +1,6 @@
 export interface DonateToFundraiserMessage {
    fundraiserID: string;
+   message: string;
    amount: number;
    userID: string | undefined;
    isSavingPaymentInformation: boolean;

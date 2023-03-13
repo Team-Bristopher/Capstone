@@ -24,6 +24,11 @@
 		/// The time & date the donation was made.
 		/// </summary>
 		public DateTime DonatedAt { get; set; }
+
+		/// <summary>
+		/// Nullable. The optional message along with the donation.
+		/// </summary>
+		public string Message { get; set; } = string.Empty;
 	}
 }
 

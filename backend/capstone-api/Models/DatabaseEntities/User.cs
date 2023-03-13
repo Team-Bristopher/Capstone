@@ -51,12 +51,6 @@ namespace capstone_api.Models.DatabaseEntities
         public string Password { get; set; } = string.Empty;
 
         /// <summary>
-        /// The comments this User has commented.
-        /// </summary>
-        [Required]
-        public List<Comment> Comments { get; set; } = new List<Comment>();
-
-        /// <summary>
         /// The donations this User has donated.
         /// </summary>
         [Required]
