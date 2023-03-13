@@ -14,6 +14,8 @@ export const Comments: FunctionComponent = () => {
       const donationPage = await getAllDonations(fundraiserContext?.fundraiser.id ?? "", pageParam, true);
 
       return donationPage;
+
+      // eslint-disable-next-line
    }, []);
 
    const { data, isFetching } = useInfiniteQuery<FundraiserDonationMessage[]>({
