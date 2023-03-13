@@ -32,11 +32,6 @@ namespace capstone_api
         public DbSet<Donation> Donations { get; set; }
 
         /// <summary>
-        /// The Comments database context.
-        /// </summary>
-        public DbSet<Comment> Comments { get; set; }
-
-        /// <summary>
         /// The FundraiserAdmins database context.
         /// </summary>
         public DbSet<FundraiserAdmin> FundraiserAdmins { get; set; }
@@ -83,14 +78,6 @@ namespace capstone_api
 
             modelBuilder.HasDefaultSchema(_schema);
 
-            modelBuilder.Entity<Comment>(entity =>
-            {
-                entity.HasKey(e => e.ID);
-
-                entity.HasOne(e => e.Fundraiser).WithMany(e => e.Comments);
-                entity.HasOne(e => e.User).WithMany(e => e.Comments);
-            });
-
             modelBuilder.Entity<Donation>(entity =>
             {
                 entity.HasKey(e => e.ID);
@@ -106,7 +93,6 @@ namespace capstone_api
                 entity.HasOne(e => e.CreatedByUser).WithMany(e => e.CreatedFundraisers);
                 entity.HasOne(e => e.Type);
 
-                entity.HasMany(e => e.Comments).WithOne(e => e.Fundraiser);
                 entity.HasMany(e => e.Donations).WithOne(e => e.Fundraiser);
                 entity.HasMany(e => e.Admins).WithOne(e => e.Fundraiser);
             });

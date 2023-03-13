@@ -41,8 +41,9 @@ namespace capstone_api.BusinessLogic
         /// </summary>
         /// <param name="page">The current page, used for pagination.</param>
         /// <param name="fundraiserID">The ID of the fundraiser.</param>
+        /// <param name="onlyComments">Indicates whether or not to only include donations with comments.</param>
         /// <returns>The list of donations.</returns>
-        public IEnumerable<FundraiserDonationMessage> GetAllDonations(Guid fundraiserID, int page);
+        public IEnumerable<FundraiserDonationMessage> GetAllDonations(Guid fundraiserID, int page, bool onlyComments);
 
         /// <summary>
         /// Gets the fundraiser information by fundraiser ID.
@@ -192,6 +193,9 @@ namespace capstone_api.BusinessLogic
                 throw new HttpResponseException((int)HttpStatusCode.NotFound);
             }
 
+            // Getting the comment count for this fundraiser.
+            long commentCount = _fundraiserDataAccess.GetFundraiserCommentCount(fundraiser.ID);
+
             // Returning the fundraiser message object.
             return new FundraiserMessage
             {
@@ -205,6 +209,7 @@ namespace capstone_api.BusinessLogic
                 Type = (int)fundraiser.Type.Type,
                 Target = fundraiser.Target,
                 EndDate = fundraiser.EndDate,
+                CommentCount = commentCount,
                 Author = new UserMessage
                 {
                     FirstName = fundraiser.CreatedByUser.FirstName,
@@ -214,7 +219,7 @@ namespace capstone_api.BusinessLogic
         }
 
         /// <inheritdoc />
-        public IEnumerable<FundraiserDonationMessage> GetAllDonations(Guid fundraiserID, int page)
+        public IEnumerable<FundraiserDonationMessage> GetAllDonations(Guid fundraiserID, int page, bool onlyComments)
         {
             // Getting the fundraiser information by ID.
             Fundraiser? fundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
@@ -228,7 +233,7 @@ namespace capstone_api.BusinessLogic
             }
 
             // Getting the current page of donations.
-            List<Donation> currentDonationPage = _fundraiserDataAccess.GetAllDonations(fundraiserID, page);
+            List<Donation> currentDonationPage = _fundraiserDataAccess.GetAllDonations(fundraiserID, page, onlyComments);
 
             return currentDonationPage.Select(a => new FundraiserDonationMessage
             {
@@ -236,6 +241,7 @@ namespace capstone_api.BusinessLogic
                 LastName = a.DonatedBy!.LastName,
                 IndividualAmount = a.Amount,
                 DonatedAt = a.DonatedOn,
+                Message = a.Message,
             });
         }
 
@@ -319,7 +325,7 @@ namespace capstone_api.BusinessLogic
                 throw new HttpResponseException((int)HttpStatusCode.NotFound);
             }
 
-            _fundraiserDataAccess.DonateToFundraiser(matchedFundraiser, matchedUser, message.Amount);
+            _fundraiserDataAccess.DonateToFundraiser(matchedFundraiser, message.Message, matchedUser, message.Amount);
         }
     }
 }

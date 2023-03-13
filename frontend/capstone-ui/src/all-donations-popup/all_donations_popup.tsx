@@ -152,7 +152,6 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
                <AlertDialogBody
                   padding="0.7em"
                >
-
                   {(data?.pages || []).map((donationPage => (
                      <>
                         {(donationPage.map((donation, idx) => (

@@ -3,4 +3,5 @@ export interface FundraiserDonationMessage {
    lastName: string;
    individualAmount: number;
    donatedAt: Date;
+   message: string;
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using capstone_api.IncomingMessages;
 using capstone_api.Models.Constants;
@@ -47,8 +48,9 @@ namespace capstone_api.DataAccessLayer
         /// </summary>
         /// <param name="page">The current page, used for pagination.</param>
 		/// <param name="fundraiserID">The ID of the fundraiser.</param>
+		/// <param name="onlyComments">Indicates whether or not to only include donations with comments.</param>
         /// <returns>The list of donations.</returns>
-        public List<Donation> GetAllDonations(Guid fundraiserID, int page);
+        public List<Donation> GetAllDonations(Guid fundraiserID, int page, bool onlyComments);
 
         /// <summary>
         /// Submits a view for a fundraiser.
@@ -68,9 +70,10 @@ namespace capstone_api.DataAccessLayer
 		/// Donates to a fundraiser.
 		/// </summary>
 		/// <param name="fundraiser">The fundraiser.</param>
+		/// <param name="message">The donation message.</param>
 		/// <param name="user">The user donating.</param>
 		/// <param name="amount">The amount to be donated.</param>
-		public void DonateToFundraiser(Fundraiser fundraiser, User user, double amount);
+		public void DonateToFundraiser(Fundraiser fundraiser, string message, User user, double amount);
 
 		/// <summary>
 		/// Returns the last 6 most recent donations to a fundraiser.
@@ -79,6 +82,13 @@ namespace capstone_api.DataAccessLayer
 		/// <param name="sortOption">The sort option of the donations.</param>
 		/// <returns>The last 6 most recent donations, by date/time.</returns>
 		public List<Donation> GetRecentDonations(DonationTimeSort sortOption, Guid fundraiserID);
+
+		/// <summary>
+		/// Gets the amount of comments a fundraiser has.
+		/// </summary>
+		/// <param name="fundraiserID">The ID of the fundraiser.</param>
+		/// <returns>The amount of comments.</returns>
+		public long GetFundraiserCommentCount(Guid fundraiserID);
 	}
 
 	/// <inheritdoc />
@@ -162,8 +172,20 @@ namespace capstone_api.DataAccessLayer
 		}
 
 		/// <inheritdoc />
-        public List<Donation> GetAllDonations(Guid fundraiser, int page)
+        public List<Donation> GetAllDonations(Guid fundraiser, int page, bool onlyComments)
 		{
+			if (onlyComments)
+			{
+                return _databaseContext.Donations
+					.Where(a => a.FundraiserID.Equals(fundraiser))
+					.Where(a => !string.IsNullOrEmpty(a.Message))
+					.Include(a => a.DonatedBy)
+					.Skip(page * 6)
+					.Take(6)
+					.OrderBy(a => a.DonatedOn)
+					.ToList();
+            }
+
 			return _databaseContext.Donations
                 .Include(a => a.DonatedBy)
                 .Skip(page * 6)
@@ -211,7 +233,7 @@ namespace capstone_api.DataAccessLayer
 		}
 
 		/// <inheritdoc />
-        public void DonateToFundraiser(Fundraiser fundraiser, User user, double amount)
+        public void DonateToFundraiser(Fundraiser fundraiser, string message, User user, double amount)
 		{
 			Donation donation = new Donation()
 			{
@@ -220,6 +242,7 @@ namespace capstone_api.DataAccessLayer
 				Fundraiser = fundraiser,
 				Amount = amount,
 				DonatedOn = DateTime.UtcNow,
+				Message = message,
 			};
 
 			_databaseContext.Add(donation);
@@ -247,5 +270,15 @@ namespace capstone_api.DataAccessLayer
 				.Take(6)
 				.ToList();
         }
-	}
+
+		/// <inheritdoc />
+        public long GetFundraiserCommentCount(Guid fundraiserID)
+		{
+			return _databaseContext.Donations
+				.Where(a => a.FundraiserID.Equals(fundraiserID))
+				.Where(a => !string.IsNullOrEmpty(a.Message))
+				.Distinct()
+				.Count();
+		}
+    }
 }

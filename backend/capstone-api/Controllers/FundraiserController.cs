@@ -99,9 +99,10 @@ namespace capstone_api.Controllers
 		[AllowAnonymous]
 		public IActionResult GetAllDonations(
 			[FromQuery] Guid fundraiserID,
-			[FromQuery] int page)
+			[FromQuery] int page,
+			[FromQuery] bool? onlyComments = false)
 		{
-			IEnumerable<FundraiserDonationMessage> donationMessages = _fundraiserBusinessLogic.GetAllDonations(fundraiserID, page);
+			IEnumerable<FundraiserDonationMessage> donationMessages = _fundraiserBusinessLogic.GetAllDonations(fundraiserID, page, onlyComments ?? false);
 
 			return Ok(donationMessages);
 		}

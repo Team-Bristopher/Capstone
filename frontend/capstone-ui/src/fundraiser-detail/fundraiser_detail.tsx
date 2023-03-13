@@ -6,6 +6,7 @@ import { MdInsertComment } from "react-icons/md";
 import { RiPencilFill } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 import { getFundraiserAmount, getFundraiserDetail, viewFundraiser } from "../api/api-calls";
+import { Comments } from "../comments/comments";
 import { DonationPopup } from "../donation-popup/donation_popup";
 import { AuthContext } from "../globals/auth_context";
 import { Button } from "../input/button";
@@ -336,7 +337,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                         <Box
                            margin="0"
                            padding="0"
-                           width="50%"
+                           width="auto"
                            display="flex"
                            flexDir="row"
                         >
@@ -352,9 +353,37 @@ export const FundraiserDetail: FunctionComponent = () => {
                               fontSize="1.2rem"
                               fontWeight="bold"
                            >
-                              Comments
+                              Comments ({fundraiserDetail?.commentCount})
                            </Text>
                         </Box>
+                        <Box
+                           margin="0"
+                           padding="0"
+                           display="flex"
+                           flexDir="row"
+                           marginLeft="1em"
+                           alignContent="center"
+                           flexWrap="wrap"
+                        >
+                           <Text
+                              width="100%"
+                              height="auto"
+                              fontSize="1rem"
+                           >
+                              Please donate to share words of support.
+                           </Text>
+                        </Box>
+                     </Container>
+                     <Container
+                        display="flex"
+                        flexDir="row"
+                        padding="0"
+                        margin="0"
+                        width="100%"
+                        maxWidth="100%"
+                        marginTop="1.2em"
+                     >
+                        <Comments />
                      </Container>
                   </Container>
                   <Container

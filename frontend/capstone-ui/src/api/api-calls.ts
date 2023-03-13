@@ -270,8 +270,8 @@ export const donateToFundraiser = (message: DonateToFundraiserMessage): Promise<
     });
 }
 
-export const getAllDonations = (fundraiserID: string, page: number): Promise<Array<FundraiserDonationMessage>> => {
-  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/donations?fundraiserID=${fundraiserID}&page=${page}`)
+export const getAllDonations = (fundraiserID: string, page: number, onlyComments: boolean = false): Promise<Array<FundraiserDonationMessage>> => {
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/donations?fundraiserID=${fundraiserID}&page=${page}&onlyComments=${onlyComments}`)
     .then((resp) => {
       switch (resp.status) {
         case 200:
