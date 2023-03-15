@@ -18,6 +18,7 @@ interface DateInputProps {
    containerStyle?: StyleProps;
    label: string;
    formInfo?: FormRegisterInfo;
+   defaultValue?: Date;
 }
 
 export const DateInput: FunctionComponent<DateInputProps> = (props: DateInputProps) => {
@@ -76,6 +77,7 @@ export const DateInput: FunctionComponent<DateInputProps> = (props: DateInputPro
                   paddingLeft="2.5em"
                   {...props.formInfo?.registerFn(props.formInfo?.name || '', props.formInfo?.registerOptions)}
                   {...props.style}
+                  defaultValue={props.defaultValue !== undefined ? new Date(props.defaultValue).toISOString().substring(0, 10) : undefined}
                />
                {hasError() &&
                   <Popover placement="top" trigger="hover">

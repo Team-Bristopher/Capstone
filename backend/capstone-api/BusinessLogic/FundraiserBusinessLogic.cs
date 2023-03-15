@@ -30,6 +30,13 @@ namespace capstone_api.BusinessLogic
 		public CreateFundraiserResponseMessage CreateFundraiser(CreateFundraiserMessage message);
 
         /// <summary>
+        /// Edits a fundraiser.
+        /// </summary>
+        /// <param name="fundraiserID">The ID of the fundraiser to edit.</param>
+        /// <param name="message">The information by which to edit the fundraiser by.</param>
+        public void EditFundraiser(Guid fundraiserID, EditFundraiserMessage message);
+
+        /// <summary>
         /// Gets the fundraiser feed.
         /// </summary>
         /// <param name="page">The current page, used for pagination.</param>
@@ -154,6 +161,55 @@ namespace capstone_api.BusinessLogic
 			{
 				FundraiserID = fundraiserID,
 			};
+        }
+
+        /// <inheritdoc />
+        public void EditFundraiser(Guid fundraiserID, EditFundraiserMessage message)
+        {
+            Claim? userIDClaim = _httpContext.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "ID");
+
+            // If the user claim is not found, or otherwise it doesn't exist.
+            if (userIDClaim == null)
+            {
+                _logger.LogError($"Unable to find the user ID claim for request");
+
+                throw new HttpResponseException((int)HttpStatusCode.Unauthorized);
+            }
+
+            // Getting the ID of the user from the claim.
+            Guid userID = Guid.Parse(userIDClaim.Value);
+
+            // Getting the user by ID.
+            User? matchedUser = _authBusinessLogic.GetUserByID(userID);
+
+            // If the user doesn't exist.
+            if (matchedUser == null)
+            {
+                _logger.LogError($"Authenticated user with claim doesn't exist in database, user ID is [{userID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.Forbidden);
+            }
+
+            // Ensuring the fundraiser exists based upon the ID.
+            Fundraiser? fundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
+
+            // If the fundraiser doesn't exist.
+            if (fundraiser == null)
+            {
+                _logger.LogError($"Fundraiser is not found while fetching fundraiser with ID [{fundraiserID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.NotFound);
+            }
+
+            // Ensuring the user is able to edit this fundraiser.
+            if (!fundraiser.CreatedByUserID.Equals(matchedUser.ID))
+            {
+                _logger.LogError($"User [{matchedUser.ID}] tried to edit fundraiser [{fundraiserID}] without permissions.");
+
+                throw new HttpResponseException((int)HttpStatusCode.Forbidden);
+            }
+
+            _fundraiserDataAccess.EditFundraiser(fundraiserID, message);
         }
 
         /// <inheritdoc />

@@ -2,6 +2,7 @@ import { FunctionComponent } from "react";
 import { Route, Routes } from "react-router-dom";
 import { CreateFundraiser } from "./create-fundraiser/create_fundraiser";
 import { DonationPayment } from "./donation-payment/donation_payment";
+import { EditFundraiser } from "./edit-fundraiser/edit_fundraiser";
 import { ForgotPassword } from "./forgot-password/forgot_password";
 import { FundraiserDetail } from "./fundraiser-detail/fundraiser_detail";
 import { Home } from "./home/home";
@@ -24,6 +25,7 @@ export const App: FunctionComponent = () => {
         <Route path="fundraiser/:fundraiserID" element={<FundraiserDetail />} />
         <Route path="fundraiser/create" element={<CreateFundraiser />} />
         <Route path="fundraiser/donate/payment" element={<DonationPayment />} />
+        <Route path="fundraiser/edit/:fundraiserID" element={<EditFundraiser />} />
 
         <Route path="settings" element={<Settings />} />
         <Route path="settings/edit" element={<SettingsEdit />} />

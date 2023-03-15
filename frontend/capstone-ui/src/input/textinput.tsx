@@ -23,6 +23,7 @@ interface TextInputProps {
    containerStyle?: StyleProps;
    placeholder?: string;
    isTopDown?: boolean;
+   defaultValue?: string;
 }
 
 export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputProps) => {
@@ -97,6 +98,7 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                   {...props.formInfo?.registerFn(props.formInfo?.name || '', props.formInfo?.registerOptions)}
                   {...props.style}
                   placeholder={props.placeholder}
+                  defaultValue={props.defaultValue ?? ""}
                />
             </Box>
          </>
@@ -157,6 +159,7 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                   fontWeight: "bold",
                   color: "#D9D9D9",
                }}
+               defaultValue={props.defaultValue ?? ""}
             />
             {hasError() &&
                <Popover placement="top" trigger="hover">

@@ -106,6 +106,17 @@ namespace capstone_api.Controllers
 
 			return Ok(donationMessages);
 		}
+
+		[HttpPost("edit")]
+        [Authorize(Policy = "RegisteredUser")]
+		public IActionResult EditFundraiser(
+			[FromQuery] Guid fundraiserID,
+			[FromBody] EditFundraiserMessage message)
+		{
+			_fundraiserBusinessLogic.EditFundraiser(fundraiserID, message);
+
+			return Ok();
+		}
     }
 }
 

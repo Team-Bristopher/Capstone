@@ -90,6 +90,7 @@ export const NumberInput: FunctionComponent<NumberInputProps> = (props: NumberIn
                      paddingLeft="2.5em"
                      {...props.formInfo?.registerFn(props.formInfo?.name || '', props.formInfo?.registerOptions)}
                      {...props.style}
+                     defaultValue={props.defaultValue}
                   />
                </ChakraNumberInput>
                {hasError() &&

@@ -4,7 +4,7 @@ import { AiOutlineFrown } from "react-icons/ai";
 import { BsFillEyeFill, BsFillPersonFill } from "react-icons/bs";
 import { MdInsertComment } from "react-icons/md";
 import { RiPencilFill } from "react-icons/ri";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getFundraiserAmount, getFundraiserDetail, viewFundraiser } from "../api/api-calls";
 import { Comments } from "../comments/comments";
 import { DonationPopup } from "../donation-popup/donation_popup";
@@ -36,6 +36,8 @@ export const FundraiserDetail: FunctionComponent = () => {
    const params = useParams();
 
    const toast = useToast();
+
+   const navigate = useNavigate();
 
    const sendGetAmountRequest = async () => {
       setIsLoading(true);
@@ -404,7 +406,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                         maxWidth="100%"
                         marginTop="1.2em"
                      >
-                        {(authContext.loggedInUser !== undefined) && (
+                        {(authContext.loggedInUser !== undefined && authContext.loggedInUser.id === fundraiserDetail?.createdBy) && (
                            <Button
                               label="Edit"
                               ariaLabel="Edit fundraiser button"
@@ -415,6 +417,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                                  "width": "8em",
                                  "paddingLeft": "0.5em"
                               }}
+                              onClick={() => { navigate(`/fundraiser/edit/${fundraiserDetail.id}`); }}
                            />
                         )}
                      </Container>
