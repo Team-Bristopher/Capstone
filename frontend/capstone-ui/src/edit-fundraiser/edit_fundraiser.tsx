@@ -105,6 +105,8 @@ export const EditFundraiser: FunctionComponent = () => {
 
    useEffect(() => {
       sendGetFundraiserInformationRequest();
+
+      // eslint-disable-next-line
    }, []);
 
    // TODO: Replace this with an actual page or 

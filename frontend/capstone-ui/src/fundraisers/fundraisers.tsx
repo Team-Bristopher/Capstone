@@ -55,8 +55,8 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
                h="auto"
             >
                <Skeleton
-                  width="30em"
-                  height="35em"
+                  width="25em"
+                  height="30em"
                />
             </GridItem>
             <GridItem
@@ -64,8 +64,8 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
                h="auto"
             >
                <Skeleton
-                  width="30em"
-                  height="35em"
+                  width="25em"
+                  height="30em"
                />
             </GridItem>
             <GridItem
@@ -73,8 +73,8 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
                h="auto"
             >
                <Skeleton
-                  width="30em"
-                  height="35em"
+                  width="25em"
+                  height="30em"
                />
             </GridItem>
          </Grid>
