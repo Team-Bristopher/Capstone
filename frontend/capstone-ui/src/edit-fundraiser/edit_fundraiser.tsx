@@ -1,12 +1,11 @@
-import { Box, Container, Text, useToast } from "@chakra-ui/react";
-import { FunctionComponent, useContext, useEffect, useState } from "react";
+import { Box, Container, Skeleton, Text, useToast } from "@chakra-ui/react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { AiOutlinePlus } from "react-icons/ai";
 import { BiCalendar } from "react-icons/bi";
+import { IoMdCheckmark } from "react-icons/io";
 import { MdOutlineAttachMoney } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
-import { createFundraiser } from "../api/api-calls";
-import { AuthContext } from "../globals/auth_context";
+import { useNavigate, useParams } from "react-router-dom";
+import { editFundraiser, getFundraiserDetail } from "../api/api-calls";
 import { FUNDRAISER_DESCRIPTION_REGEX, FUNDRAISER_DESCRIPTION_TOO_LONG_ERROR, FUNDRAISER_DESCRIPTION_TOO_SHORT_ERROR, FUNDRAISER_TITLE_REGEX, FUNDRAISER_TITLE_TOO_LONG_ERROR, FUNDRAISER_TITLE_TOO_SHORT_ERROR, GOAL_TOO_SMALL_ERROR, INVALID_FUNDRAISER_DESCRIPTION_ERROR, INVALID_FUNDRAISER_TITLE_ERROR, REQUIRED_FIELD_ERROR } from "../globals/form_globals";
 import { Button } from "../input/button";
 import { DateInput } from "../input/dateinput";
@@ -14,10 +13,11 @@ import { DropdownInput } from "../input/dropdowninput";
 import { NumberInput } from "../input/numberinput";
 import { TextInput } from "../input/textinput";
 import { LoadingDialog } from "../loading-dialog/loading_dialog";
-import { CreateFundraiserMessage } from "../models/outgoing/CreateFundraiserMessage";
+import { Fundraiser } from "../models/incoming/Fundraiser";
+import { EditFundraiserMessage } from "../models/outgoing/EditFundraiserMessage";
 import { Page } from "../page/page";
 
-enum CreateFundraiserFormNames {
+enum EditFundraiserFormNames {
    title = "title",
    description = "description",
    fundraiserType = "fundraiserType",
@@ -25,7 +25,7 @@ enum CreateFundraiserFormNames {
    goal = "goal",
 }
 
-interface CreateFundraiserForm {
+interface EditFundraiserForm {
    title: string;
    description: string;
    fundraiserType: number;
@@ -33,41 +33,57 @@ interface CreateFundraiserForm {
    endDate: Date;
 }
 
-export const CreateFundraiser: FunctionComponent = () => {
-   const [isLoadingOpen, setIsLoadingOpen] = useState<boolean>(false);
-   const [categoryDropdownValue, setCategoryDropdownValue] = useState<string>("0");
+export const EditFundraiser: FunctionComponent = () => {
+   const [isLoadingOpen, setIsLoadingOpen] = useState<boolean>(true);
+   const [fundraiserDetail, setFundraiserDetail] = useState<Fundraiser>();
+   const [categoryDropdownValue, setCategoryDropdownValue] = useState<string>(fundraiserDetail?.type.toString() ?? "0");
 
-   const navigate = useNavigate();
+   const params = useParams();
+
    const toast = useToast();
 
-   const authContext = useContext(AuthContext);
+   const navigate = useNavigate();
 
-   const { register, getValues, formState, handleSubmit } = useForm<CreateFundraiserForm>({
+   const { register, getValues, formState, handleSubmit } = useForm<EditFundraiserForm>({
       criteriaMode: "all",
       reValidateMode: "onChange",
    });
 
-   const hasErrors = (): boolean => {
-      return (
-         formState.errors.title !== undefined ||
-         formState.errors.description !== undefined ||
-         formState.errors.endDate !== undefined ||
-         formState.errors.fundraiserType !== undefined
-      );
+   const sendGetFundraiserInformationRequest = async () => {
+      const response = await getFundraiserDetail(params.fundraiserID || "");
+
+      if (response === undefined) {
+         setIsLoadingOpen(false);
+
+         toast({
+            title: "An unknown error has occured.",
+            status: "error",
+            duration: 3000,
+            isClosable: false,
+         });
+
+         return;
+      }
+
+      setFundraiserDetail(response);
+
+      setCategoryDropdownValue(response.type.toString());
+
+      setIsLoadingOpen(false);
    }
 
-   const sendCreateFundraiserRequest = async () => {
+   const sendEditFundraiserRequest = async () => {
       const values = getValues();
 
-      const message: CreateFundraiserMessage = {
+      const editFundraiserMessage: EditFundraiserMessage = {
          title: values.title,
          description: values.description,
          goal: values.goal,
-         category: parseInt(categoryDropdownValue),
          expirationDate: values.endDate,
+         category: parseInt(categoryDropdownValue),
       };
 
-      const response = await createFundraiser(message);
+      const response = await editFundraiser(fundraiserDetail?.id ?? "", editFundraiserMessage);
 
       toast({
          title: response.message,
@@ -76,36 +92,100 @@ export const CreateFundraiser: FunctionComponent = () => {
          isClosable: false,
       });
 
-      // Redirect to fundraiser detail.
       if (response.responseType === "success") {
-         navigate(`/fundraiser/${response.fundraiserID}`);
+         navigate(`/fundraiser/${fundraiserDetail?.id}`);
       }
    }
 
-   useEffect(() => {
-      if (!formState.isSubmitting) {
-         return;
-      }
-
-      if (hasErrors()) {
-         return;
-      }
-
+   const onSubmit = () => {
       setIsLoadingOpen(true);
 
-      sendCreateFundraiserRequest();
+      sendEditFundraiserRequest();
+   }
+
+   useEffect(() => {
+      sendGetFundraiserInformationRequest();
 
       // eslint-disable-next-line
-   }, [formState.isSubmitting]);
+   }, []);
 
-   if (!authContext || !authContext.loggedInUser) {
+   // TODO: Replace this with an actual page or 
+   // redirect.
+   if (params?.fundraiserID === undefined) {
+      return (
+         <>
+            No
+         </>
+      );
+   }
+
+   if (fundraiserDetail === undefined) {
       return (
          <>
             <Page>
-               Not allowed
+               <Container
+                  display="flex"
+                  paddingTop="2em"
+                  paddingLeft="8rem"
+                  paddingRight="8rem"
+                  width="100%"
+                  maxWidth="100%"
+                  justifyContent="space-between"
+               >
+                  <Skeleton
+                     width="100%"
+                     height="3em"
+                     speed={1}
+                  >
+                     This text is not visible but required.
+                  </Skeleton>
+               </Container>
+               <Container
+                  display="flex"
+                  flexDir="row"
+                  width="100%"
+                  maxWidth="100%"
+                  paddingLeft="7rem"
+                  paddingRight="7rem"
+               >
+                  <Container
+                     display="flex"
+                     flexDir="column"
+                     width="70%"
+                     maxWidth="70%"
+                     alignContent="start"
+                     flexWrap="wrap"
+                     marginTop="1em"
+                  >
+                     <Skeleton
+                        width="100%"
+                        height="100vh"
+                        speed={1}
+                     >
+                        This text is not visible but required.
+                     </Skeleton>
+                  </Container>
+                  <Container
+                     display="flex"
+                     flexDir="column"
+                     width="30%"
+                     maxWidth="30%"
+                     alignContent="start"
+                     flexWrap="wrap"
+                     marginTop="1em"
+                  >
+                     <Skeleton
+                        width="100%"
+                        height="100vh"
+                        speed={1}
+                     >
+                        This text is not visible but required.
+                     </Skeleton>
+                  </Container>
+               </Container>
             </Page>
          </>
-      )
+      );
    }
 
    return (
@@ -114,7 +194,7 @@ export const CreateFundraiser: FunctionComponent = () => {
             <LoadingDialog
                open={isLoadingOpen}
             />
-            <form onSubmit={handleSubmit(() => { })}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                <Container
                   display="flex"
                   paddingTop="2em"
@@ -129,15 +209,17 @@ export const CreateFundraiser: FunctionComponent = () => {
                      fontWeight="bold"
                      color="#2B2D42"
                   >
-                     Create Fundraiser
+                     Edit Fundraiser
                   </Text>
                   <Button
-                     label="Create"
+                     label="Save"
+                     ariaLabel="Save edited fundraiser"
                      variant="icon_text"
-                     icon={AiOutlinePlus}
-                     ariaLabel="Edit profile button"
+                     icon={IoMdCheckmark}
                      style={{
-                        padding: "1em"
+                        "marginLeft": "auto",
+                        "width": "8em",
+                        "paddingLeft": "0.5em"
                      }}
                      isFormSubmit={true}
                   />
@@ -168,11 +250,12 @@ export const CreateFundraiser: FunctionComponent = () => {
                            label="Fundraiser Name"
                            ariaLabel="Fundraiser name input"
                            variant="text_only"
+                           defaultValue={fundraiserDetail?.title}
                            containerStyle={{
                               width: "100%"
                            }}
                            formInfo={{
-                              name: CreateFundraiserFormNames.title,
+                              name: EditFundraiserFormNames.title,
                               registerFn: register,
                               registerOptions: {
                                  required: REQUIRED_FIELD_ERROR,
@@ -205,6 +288,7 @@ export const CreateFundraiser: FunctionComponent = () => {
                         variant="text_only"
                         label="Description"
                         ariaLabel="Description of fundraiser input"
+                        defaultValue={fundraiserDetail?.description}
                         isTopDown={true}
                         containerStyle={{
                            height: "20em",
@@ -213,7 +297,7 @@ export const CreateFundraiser: FunctionComponent = () => {
                            height: "20em",
                         }}
                         formInfo={{
-                           name: CreateFundraiserFormNames.description,
+                           name: EditFundraiserFormNames.description,
                            registerFn: register,
                            registerOptions: {
                               required: REQUIRED_FIELD_ERROR,
@@ -245,12 +329,12 @@ export const CreateFundraiser: FunctionComponent = () => {
                      <NumberInput
                         label="End Goal"
                         ariaLabel="End goal of fundraiser input"
-                        defaultValue={0}
+                        defaultValue={fundraiserDetail?.target ?? 0}
                         keepWithinRange={true}
                         clampValueOnBlur={true}
                         icon={MdOutlineAttachMoney}
                         formInfo={{
-                           name: CreateFundraiserFormNames.goal,
+                           name: EditFundraiserFormNames.goal,
                            registerFn: register,
                            registerOptions: {
                               required: REQUIRED_FIELD_ERROR,
@@ -271,13 +355,14 @@ export const CreateFundraiser: FunctionComponent = () => {
                            marginTop: "0em",
                         }}
                         formInfo={{
-                           name: CreateFundraiserFormNames.endDate,
+                           name: EditFundraiserFormNames.endDate,
                            registerFn: register,
                            registerOptions: {
                               required: REQUIRED_FIELD_ERROR,
                            },
                            errorMessage: formState.errors.endDate?.message || "",
                         }}
+                        defaultValue={fundraiserDetail.endDate}
                      />
                      <DropdownInput
                         label="Category"
@@ -287,6 +372,7 @@ export const CreateFundraiser: FunctionComponent = () => {
                            marginTop: "0em",
                         }}
                         onChange={(val) => { setCategoryDropdownValue(val); }}
+                        defaultValue={fundraiserDetail.type}
                         values={[
                            {
                               value: "0",

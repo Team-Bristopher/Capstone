@@ -1,5 +1,5 @@
 export interface MyUserResponseSuccess {
-   ID: string;
+   id: string;
    firstName: string;
    lastName: string;
    email: string;

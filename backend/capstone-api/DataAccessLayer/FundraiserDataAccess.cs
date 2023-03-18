@@ -37,6 +37,13 @@ namespace capstone_api.DataAccessLayer
 		public Guid CreateFundraiser(CreateFundraiserMessage message, Guid userID);
 
 		/// <summary>
+		/// Edits a fundraiser.
+		/// </summary>
+		/// <param name="fundraiserID">The ID of the fundraiser to edit.</param>
+		/// <param name="message">The information by which to edit the fundraiser.</param>
+		public void EditFundraiser(Guid fundraiserID, EditFundraiserMessage message);
+
+		/// <summary>
 		/// Gets the fundraiser feed.
 		/// </summary>
 		/// <param name="page">The current page, used for pagination.</param>
@@ -161,6 +168,27 @@ namespace capstone_api.DataAccessLayer
 		}
 
 		/// <inheritdoc />
+        public void EditFundraiser(Guid fundraiserID, EditFundraiserMessage message)
+		{
+			Fundraiser? matchedFundraiser = _databaseContext.Fundraisers
+				.Where(a => a.ID.Equals(fundraiserID))
+				.First();
+
+			FundraiserType fundraiserType = _databaseContext.FundraiserType
+				.Where(a => a.Type.Equals(message.Category))
+				.First();
+
+			matchedFundraiser.Title = message.Title;
+			matchedFundraiser.Description = message.Description;
+			matchedFundraiser.Target = message.Goal;
+			matchedFundraiser.EndDate = message.ExpirationDate.ToUniversalTime();
+			matchedFundraiser.Type = fundraiserType;
+			matchedFundraiser.ModifiedOn = DateTime.UtcNow;
+
+			_databaseContext.SaveChanges();
+		}
+
+        /// <inheritdoc />
         public List<Fundraiser> GetFundraisers(int page)
 		{
 			return _databaseContext.Fundraisers

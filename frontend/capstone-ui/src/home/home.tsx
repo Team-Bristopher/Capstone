@@ -42,7 +42,7 @@ export const Home: FunctionComponent = () => {
           width="100%"
           maxWidth="100%"
         >
-          { authContext.loggedInUser !== undefined &&
+          {authContext.loggedInUser !== undefined &&
             <Button
               ariaLabel="Create fundraiser button"
               label="Create Fundraiser"
@@ -81,7 +81,7 @@ export const Home: FunctionComponent = () => {
               marginTop="0.1rem"
             />
             <Input
-              placeholder="Search for fundraisesrs..."
+              placeholder="Search for fundraisers..."
               aria-label="Fundraiser search bar"
               width="60%"
               border="none"

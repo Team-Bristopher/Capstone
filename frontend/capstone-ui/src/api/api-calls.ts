@@ -1,5 +1,6 @@
 import { CreateFundraiserResponseMessage, CreateFundraiserResponseMessageRaw } from "../models/incoming/CreateFundraiserResponseMessage";
 import { DonateToFundraiserResponse } from "../models/incoming/DonateToFundraiserResponse";
+import { EditFundraiserResponse } from "../models/incoming/EditFundraiserResponse";
 import { EditUserMessageResponse } from "../models/incoming/EditUserMessageResponse";
 import { Fundraiser } from "../models/incoming/Fundraiser";
 import { FundraiserDonationAmountMessage } from "../models/incoming/FundraiserDonationAmountMessage";
@@ -10,6 +11,7 @@ import { MyUserResponse } from "../models/incoming/MyUserResponse";
 import { RegisterUserResponse } from "../models/incoming/RegisterUserResponse";
 import { CreateFundraiserMessage } from "../models/outgoing/CreateFundraiserMessage";
 import { DonateToFundraiserMessage } from "../models/outgoing/DonateToFundraiserMessage";
+import { EditFundraiserMessage } from "../models/outgoing/EditFundraiserMessage";
 import { EditUserMessage } from "../models/outgoing/EditUserMessage";
 import { LoginUserMessage } from "../models/outgoing/LoginUserMessage";
 import { RegisterUserMessage } from "../models/outgoing/RegisterUserMessage";
@@ -278,6 +280,33 @@ export const getAllDonations = (fundraiserID: string, page: number, onlyComments
           return resp.json()
         default:
           return []
+      }
+    })
+}
+
+export const editFundraiser = (fundraiserID: string, message: EditFundraiserMessage): Promise<EditFundraiserResponse> => {
+  const authorization = localStorage.getItem("accessToken");
+
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/edit?fundraiserID=${fundraiserID}`, {
+    headers: {
+      "Authorization": "Bearer " + (authorization || ""),
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(message)
+  })
+    .then((resp) => {
+      switch (resp.status) {
+        case 200:
+          return {
+            message: "Edited fundraiser sucessfully",
+            responseType: "success",
+          } as EditFundraiserResponse
+        default:
+          return {
+            message: "An unknown error has occured",
+            responseType: "error",
+          } as EditFundraiserResponse
       }
     })
 }

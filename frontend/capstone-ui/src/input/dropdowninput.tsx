@@ -11,6 +11,7 @@ interface DropdownInputProps {
    ariaLabel: string;
    values: Array<DropdownInputValues>;
    label: string;
+   defaultValue?: number;
    onChange: (value: string) => void;
 }
 
@@ -49,7 +50,8 @@ export const DropdownInput: FunctionComponent<DropdownInputProps> = (props: Drop
                height="2.5rem"
                marginRight="0.2rem"
                fontWeight="bold"
-               onChange={(e) => { console.info(e); props.onChange(e.target.value); }}
+               onChange={(e) => { props.onChange(e.target.value); }}
+               defaultValue={props.defaultValue?.toString()}
             >
                {props.values.map((val) => (
                   <option value={val.value}>{val.name}</option>
