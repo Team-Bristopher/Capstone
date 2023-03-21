@@ -1,11 +1,12 @@
 import { faker } from "@faker-js/faker";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, RenderResult } from "@testing-library/react";
 import React from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter } from "react-router-dom";
 import { AllDonationsPopup } from "../../src/all-donations-popup/all_donations_popup";
 import * as api from "../../src/api/api-calls";
-import { Home } from "../../src/home/home";
+import { FundraiserContext } from "../../src/fundraiser-detail/fundraiser_detail";
+import { Fundraiser } from "../../src/models/incoming/Fundraiser";
 import { FundraiserDonationMessage } from "../../src/models/incoming/FundraiserDonationMessage";
 
 jest.mock("../../src/api/api-calls");
@@ -26,22 +27,45 @@ const getMockDonationMessage = (amt: number): Array<FundraiserDonationMessage> =
    return donations;
 }
 
+const generateMockFundraiser = (): Fundraiser => {
+   return {
+      id: faker.finance.bitcoinAddress(),
+      type: 0,
+      title: faker.random.words(),
+      description: faker.random.words(),
+      views: faker.datatype.number(),
+      target: faker.datatype.number(),
+      createdOn: new Date(),
+      createdBy: faker.name.fullName(),
+      modifiedOn: new Date(),
+      endDate: new Date(),
+      author: {
+         firstName: faker.name.firstName(),
+         lastName: faker.name.lastName(),
+      },
+      commentCount: 0,
+   };
+}
+
 describe("all donations popup tests", () => {
    beforeEach(() => jest.clearAllMocks());
 
-   it("renders all donations popup", () => {
+   it("renders name of fundraiser properly", async () => {
       const queryClient = new QueryClient();
 
-      const all_donations_popup = render(
+      const mockFundraiser = generateMockFundraiser();
+
+      const component = render(
          <BrowserRouter>
             <QueryClientProvider client={queryClient}>
-               <Home />
+               <FundraiserContext.Provider value={{ fundraiser: mockFundraiser }}>
+                  <AllDonationsPopup onClose={() => { }} />
+               </FundraiserContext.Provider>
             </QueryClientProvider>
-         </BrowserRouter>
+         </BrowserRouter >
       );
 
-      // Children existence.
-      expect(all_donations_popup.container.childNodes.length).toBeGreaterThan(0);
+      expect(component.findByText(mockFundraiser.title)).toBeTruthy();
    });
 
    it("renders comments properly", async () => {

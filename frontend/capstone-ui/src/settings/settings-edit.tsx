@@ -32,13 +32,6 @@ export const SettingsEdit: FunctionComponent = () => {
       reValidateMode: "onChange",
    });
 
-   const hasErrors = (): boolean => {
-      return (
-         formState.errors.firstName !== undefined ||
-         formState.errors.lastName !== undefined
-      );
-   }
-
    const sendUpdateProfileRequest = async () => {
       const values = getValues();
 
@@ -71,21 +64,11 @@ export const SettingsEdit: FunctionComponent = () => {
       // eslint-disable-next-line
    }, [authContext]);
 
-   useEffect(() => {
-      if (!formState.isSubmitting) {
-         return;
-      }
-
-      if (hasErrors()) {
-         return;
-      }
-
+   const onSubmit = () => {
       setIsLoadingOpen(true);
 
       sendUpdateProfileRequest();
-
-      // eslint-disable-next-line
-   }, [formState.isSubmitting]);
+   }
 
    return (
       <>
@@ -93,10 +76,9 @@ export const SettingsEdit: FunctionComponent = () => {
             <LoadingDialog
                open={isLoadingOpen}
             />
-            <form onSubmit={handleSubmit(() => { })}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                <Container
                   display="flex"
-                  padding="2em"
                   paddingLeft="8rem"
                   paddingRight="8rem"
                   width="100%"

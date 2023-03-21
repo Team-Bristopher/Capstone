@@ -210,11 +210,12 @@ namespace capstone_api.DataAccessLayer
 					.Include(a => a.DonatedBy)
 					.Skip(page * 6)
 					.Take(6)
-					.OrderBy(a => a.DonatedOn)
+					.OrderByDescending(a => a.DonatedOn)
 					.ToList();
             }
 
 			return _databaseContext.Donations
+				.Where(a => a.FundraiserID.Equals(fundraiser))
                 .Include(a => a.DonatedBy)
                 .Skip(page * 6)
                 .Take(6)

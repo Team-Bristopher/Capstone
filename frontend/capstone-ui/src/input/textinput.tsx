@@ -76,8 +76,8 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                               />
                            </div>
                         </PopoverTrigger>
-                        <PopoverContent zIndex="1000">
-                           <PopoverBody textAlign="center">
+                        <PopoverContent zIndex="1000" width="auto" minWidth="0">
+                           <PopoverBody textAlign="center" color="black" fontSize="md">
                               {props.formInfo?.errorMessage || ""}
                            </PopoverBody>
                         </PopoverContent>
@@ -173,7 +173,7 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                         />
                      </div>
                   </PopoverTrigger>
-                  <PopoverContent zIndex="1000">
+                  <PopoverContent zIndex="1000" width="auto" minWidth="0">
                      <PopoverBody textAlign="center">
                         {props.formInfo?.errorMessage || ""}
                      </PopoverBody>

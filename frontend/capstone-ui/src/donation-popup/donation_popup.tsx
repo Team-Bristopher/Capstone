@@ -6,6 +6,7 @@ import { MdOutlineAttachMoney } from "react-icons/md";
 import { VscClose } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
 import { FundraiserContext } from "../fundraiser-detail/fundraiser_detail";
+import { AuthContext } from "../globals/auth_context";
 import { DONATION_MESSAGE_TOO_LONG, DONATION_TOO_SMALL_ERROR, REQUIRED_FIELD_ERROR } from "../globals/form_globals";
 import { Button } from "../input/button";
 import { NumberInput } from "../input/numberinput";
@@ -31,6 +32,8 @@ export const DonationPopup: FunctionComponent<DonationPopupProps> = (props: Dona
    const cancelRef = useRef(null);
 
    const navigate = useNavigate();
+
+   const authContext = useContext(AuthContext);
 
    const { register, getValues, formState, handleSubmit } = useForm<DonationPopupForm>({
       criteriaMode: "all",
@@ -166,6 +169,7 @@ export const DonationPopup: FunctionComponent<DonationPopupProps> = (props: Dona
                            colorScheme="red"
                            defaultChecked={true}
                            {...register(DonationPopupFormNames.anonymousDonation)}
+                           isDisabled={authContext.loggedInUser === undefined}
                         >
                            <Text
                               color="#2B2D42"

@@ -9,4 +9,5 @@ export interface DonateToFundraiserMessage {
    cardNumber: string;
    expirationDate: string;
    securityCode: string;
+   isAnonymous: boolean;
 }

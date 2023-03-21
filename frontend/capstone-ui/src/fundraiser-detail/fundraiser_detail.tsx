@@ -9,6 +9,7 @@ import { getFundraiserAmount, getFundraiserDetail, viewFundraiser } from "../api
 import { Comments } from "../comments/comments";
 import { DonationPopup } from "../donation-popup/donation_popup";
 import { AuthContext } from "../globals/auth_context";
+import { formatCurrencyToString, getFormattedDateString } from "../globals/helpers";
 import { Button } from "../input/button";
 import { Fundraiser } from "../models/incoming/Fundraiser";
 import { FundraiserDonationMessage } from "../models/incoming/FundraiserDonationMessage";
@@ -114,7 +115,7 @@ export const FundraiserDetail: FunctionComponent = () => {
       setDonationTimeSort(timeOption);
    }
 
-   if (isLoading) {
+   if (isLoading || fundraiserDetail === undefined) {
       return (
          <>
             <Page>
@@ -314,10 +315,8 @@ export const FundraiserDetail: FunctionComponent = () => {
                            width="100%"
                            textOverflow="ellipsis"
                            fontSize="1.2rem"
-                           maxHeight="15em"
+                           maxWidth="100%"
                            height="auto"
-                           overflow="hidden"
-                           whiteSpace="nowrap"
                         >
                            {fundraiserDetail?.description}
                         </Text>
@@ -395,18 +394,17 @@ export const FundraiserDetail: FunctionComponent = () => {
                      maxWidth="30%"
                      alignContent="start"
                      flexWrap="wrap"
-                     marginTop="1em"
                   >
-                     <Container
-                        display="flex"
-                        flexDir="row"
-                        padding="0"
-                        margin="0"
-                        width="100%"
-                        maxWidth="100%"
-                        marginTop="1.2em"
-                     >
-                        {(authContext.loggedInUser !== undefined && authContext.loggedInUser.id === fundraiserDetail?.createdBy) && (
+                     {(authContext.loggedInUser !== undefined && authContext.loggedInUser.id === fundraiserDetail?.createdBy) && (
+                        <Container
+                           display="flex"
+                           flexDir="row"
+                           padding="0"
+                           margin="0"
+                           width="100%"
+                           maxWidth="100%"
+                           marginTop="1.2em"
+                        >
                            <Button
                               label="Edit"
                               ariaLabel="Edit fundraiser button"
@@ -419,8 +417,8 @@ export const FundraiserDetail: FunctionComponent = () => {
                               }}
                               onClick={() => { navigate(`/fundraiser/edit/${fundraiserDetail.id}`); }}
                            />
-                        )}
-                     </Container>
+                        </Container>
+                     )}
                      <Container
                         display="flex"
                         flexDir="row"
@@ -433,7 +431,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                         <Box
                            padding="0"
                            margin="0"
-                           width="50%"
+                           width="65%"
                            display="flex"
                            flexDir="row"
                         >
@@ -444,7 +442,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                               marginRight="0.3em"
                               marginTop="0.5em"
                            >
-                              ${donatedAmount}
+                              {formatCurrencyToString(donatedAmount)}
                            </Text>
                            <Text
                               color="#2B2D42"
@@ -453,7 +451,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                               marginRight="0.3em"
                               marginTop="0.5em"
                            >
-                              / ${fundraiserDetail?.target}
+                              / {formatCurrencyToString(fundraiserDetail?.target)}
                            </Text>
                         </Box>
                         <Box
@@ -461,7 +459,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                            margin="0"
                            display="flex"
                            flexDir="row"
-                           width="50%"
+                           width="35%"
                         >
                            <Text
                               color="#2B2D42"
@@ -471,7 +469,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                               marginTop="0.5em"
                               marginLeft="auto"
                            >
-                              Ends {new Date(fundraiserDetail?.endDate || "").toDateString()}
+                              Ends {getFormattedDateString(new Date(fundraiserDetail?.endDate))}
                            </Text>
                         </Box>
                      </Container>

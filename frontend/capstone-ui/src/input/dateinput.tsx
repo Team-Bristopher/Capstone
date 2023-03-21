@@ -91,7 +91,7 @@ export const DateInput: FunctionComponent<DateInputProps> = (props: DateInputPro
                            />
                         </div>
                      </PopoverTrigger>
-                     <PopoverContent zIndex="1000">
+                     <PopoverContent zIndex="1000" width="auto" minWidth="0">
                         <PopoverBody textAlign="center">
                            {props.formInfo?.errorMessage || ""}
                         </PopoverBody>

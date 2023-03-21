@@ -3,6 +3,7 @@ import { FunctionComponent, useContext } from "react";
 import { MdSettings } from "react-icons/md";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../globals/auth_context";
+import { RomeIcon } from "../icons/rome_icon";
 import { Button } from "../input/button";
 
 export const Navbar: FunctionComponent = () => {
@@ -21,157 +22,171 @@ export const Navbar: FunctionComponent = () => {
   return (
     <>
       <Container
-        width="100%"
-        height="6rem"
-        margin="0"
         padding="0"
-        maxWidth="100vw"
+        margin="0"
         display="flex"
-        style={{
-          "background": "linear-gradient(0deg, rgba(43,45,66,1) 36%, rgba(217,217,217,1) 36%)",
-        }}
+        flexDir="row"
+        maxW="100%"
+        width="100%"
+        height="6em"
       >
-        <img
-          src="/rome_logo.png"
-          width="123px"
-          height="123px"
-          alt="Project ROME Logo"
-          style={{
-            "position": "absolute"
-          }}
-        />
         <Container
-          width="122px"
-          height="35px"
-          padding="0"
-          marginRight="0"
-          marginLeft="0"
-          marginTop="auto"
-          style={{
-            "background": "linear-gradient(270deg, rgba(43,45,66,1) 20%, rgba(217,217,217,1) 20%)",
-          }}
-        />
-        <Container
-          width="auto"
-          marginLeft="1rem"
-          padding="0"
           margin="0"
-          height="100%"
-          display="flex"
+          padding="0"
+          backgroundColor="#D9D9D9"
+          width="8.45em"
+          height="5.6em"
         >
-          <Text
-            fontSize="4xl"
-            color="#D90429"
-            fontWeight="bold"
-            marginTop="0.2em"
-            onClick={() => { navigate("/"); }}
-            _hover={{
-              "cursor": "pointer",
-            }}
-          >
-            R O M E
-          </Text>
+          <RomeIcon />
         </Container>
         <Container
-          width="20%"
-          height="100%"
-          margin="0"
-          paddingRight="1em"
-          maxWidth="100vw"
-          marginLeft="auto"
+          width="100%"
+          maxWidth="100%"
           display="flex"
-          flexDir="row"
-          justifyContent="right"
+          flexDir="column"
+          padding="0"
+          margin="0"
         >
-          <Box
-            width="auto"
+          <Container
+            width="100%"
+            height="62.71%"
+            margin="0"
             padding="0"
-            marginLeft="0"
-            marginRight="0"
-            marginBottom="0"
-            marginTop="0.75em"
+            maxWidth="100vw"
             display="flex"
-            flexDir="row"
-            alignItems="top"
-            height="2em"
+            backgroundColor="#D9D9D9"
           >
-            {authContext.loggedInUser === undefined &&
-              <Link as={ReactRouterLink} to="/login">
-                <Button
-                  label="Log In"
-                  variant="text_only"
-                  ariaLabel="Log on button"
-                  style={{
-                    marginRight: "1em",
-                  }}
-                />
-              </Link>
-            }
-            {authContext.loggedInUser !== undefined &&
-              (
-                <Container
-                  margin="0"
-                  padding="0"
-                  height="2.5em"
-                  display="flex"
-                  alignItems="center"
-                  marginRight="1em"
-                >
-                  <Text
-                    color="#2B2D42"
-                    fontWeight="bold"
-                  >
-                    Welcome, {authContext.loggedInUser.firstName} {authContext.loggedInUser.lastName}
-                  </Text>
-                </Container>
-              )
-            }
-            {authContext.loggedInUser !== undefined && (
-              <Popover
-                placement="bottom"
+            <Container
+              width="auto"
+              marginLeft="1rem"
+              padding="0"
+              margin="0"
+              height="100%"
+              display="flex"
+            >
+              <Text
+                fontSize="4xl"
+                color="#D90429"
+                fontWeight="bold"
+                marginTop="0.2em"
+                onClick={() => { navigate("/"); }}
+                _hover={{
+                  "cursor": "pointer",
+                }}
               >
-                <PopoverTrigger>
-                  <div>
+                R O M E
+              </Text>
+            </Container>
+            <Container
+              width="20%"
+              height="100%"
+              margin="0"
+              paddingRight="1em"
+              maxWidth="100vw"
+              marginLeft="auto"
+              display="flex"
+              flexDir="row"
+              justifyContent="right"
+            >
+              <Box
+                width="auto"
+                padding="0"
+                marginLeft="0"
+                marginRight="0"
+                marginBottom="0"
+                marginTop="0.75em"
+                display="flex"
+                flexDir="row"
+                alignItems="top"
+                height="2em"
+              >
+                {authContext.loggedInUser === undefined &&
+                  <Link as={ReactRouterLink} to="/login">
                     <Button
-                      variant="icon_button"
-                      ariaLabel="Settings"
-                      icon={MdSettings}
+                      label="Log In"
+                      variant="text_only"
+                      ariaLabel="Log on button"
                       style={{
-                        width: "1em",
+                        marginRight: "1em",
                       }}
                     />
-                  </div>
-                </PopoverTrigger>
+                  </Link>
+                }
+                {authContext.loggedInUser !== undefined &&
+                  (
+                    <Container
+                      margin="0"
+                      padding="0"
+                      height="2.5em"
+                      display="flex"
+                      alignItems="center"
+                      marginRight="1em"
+                    >
+                      <Text
+                        color="#2B2D42"
+                        fontWeight="bold"
+                      >
+                        Welcome, {authContext.loggedInUser.firstName} {authContext.loggedInUser.lastName}
+                      </Text>
+                    </Container>
+                  )
+                }
+                {authContext.loggedInUser !== undefined && (
+                  <Popover
+                    placement="bottom"
+                  >
+                    <PopoverTrigger>
+                      <div>
+                        <Button
+                          variant="icon_button"
+                          ariaLabel="Settings"
+                          icon={MdSettings}
+                          style={{
+                            width: "1em",
+                          }}
+                        />
+                      </div>
+                    </PopoverTrigger>
 
-                <PopoverContent
-                  zIndex="1000"
-                  padding="1em"
-                  minWidth="1em"
-                  width="10em"
-                >
-                  <ChakraButton
-                    padding="0.5rem"
-                    margin="0"
-                    width="100%"
-                    height="3rem"
-                    onClick={() => { navigate("/settings"); }}
-                  >
-                    Profile
-                  </ChakraButton>
-                  <ChakraButton
-                    padding="0.5rem"
-                    margin="0"
-                    width="100%"
-                    height="3rem"
-                    marginTop="1em"
-                    onClick={signOut}
-                  >
-                    Sign Out
-                  </ChakraButton>
-                </PopoverContent>
-              </Popover>
-            )}
-          </Box>
+                    <PopoverContent
+                      zIndex="1000"
+                      padding="1em"
+                      minWidth="1em"
+                      width="10em"
+                    >
+                      <ChakraButton
+                        padding="0.5rem"
+                        margin="0"
+                        width="100%"
+                        height="3rem"
+                        onClick={() => { navigate("/settings"); }}
+                      >
+                        Profile
+                      </ChakraButton>
+                      <ChakraButton
+                        padding="0.5rem"
+                        margin="0"
+                        width="100%"
+                        height="3rem"
+                        marginTop="1em"
+                        onClick={signOut}
+                      >
+                        Sign Out
+                      </ChakraButton>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </Box>
+            </Container>
+          </Container>
+          <Container
+            padding="0"
+            margin="0"
+            maxWidth="100%"
+            width="100%"
+            height="1.98em"
+            backgroundColor="#2B2D42"
+          />
         </Container>
       </Container>
     </>

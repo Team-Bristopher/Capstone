@@ -20,14 +20,35 @@ export const getRelativeTimeText = (current: number, previous: number): string =
    }
 
    else if (elapsed < msPerMonth) {
-      return "approximately " + Math.round(elapsed / msPerDay) + " days ago";
+      return "~" + Math.round(elapsed / msPerDay) + " days ago";
    }
 
    else if (elapsed < msPerYear) {
-      return "approximately " + Math.round(elapsed / msPerMonth) + " months ago";
+      return "~" + Math.round(elapsed / msPerMonth) + " months ago";
    }
 
    else {
-      return "approximately " + Math.round(elapsed / msPerYear) + " years ago";
+      return "~" + Math.round(elapsed / msPerYear) + " years ago";
    }
+}
+
+export const getFormattedDateString = (date: Date): string => {
+   const year = date.getFullYear();
+   const day = date.getDay();
+   const month = date.getMonth();
+
+   return `${day}/${month}/${year}`;
+}
+
+export const formatCurrencyToString = (amount: number): string => {
+   const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      compactDisplay: "short",
+   });
+
+   const formattedString = formatter.format(amount);
+
+   // Removing empty cents.
+   return formattedString.replace(".00", "");
 }

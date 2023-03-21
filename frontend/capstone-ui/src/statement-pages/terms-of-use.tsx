@@ -11,7 +11,7 @@ export const TermsOfUse: FunctionComponent = () => {
                height="100%"
                maxWidth="100vw"
                display="flex"
-               justifyContent="center"
+               justifyContent="start"
                color="#2B2D42"
                flexDir="column"
                overflow="auto"

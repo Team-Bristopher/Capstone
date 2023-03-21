@@ -105,7 +105,7 @@ export const NumberInput: FunctionComponent<NumberInputProps> = (props: NumberIn
                            />
                         </div>
                      </PopoverTrigger>
-                     <PopoverContent zIndex="1000">
+                     <PopoverContent zIndex="1000" width="auto" minWidth="0">
                         <PopoverBody textAlign="center">
                            {props.formInfo?.errorMessage || ""}
                         </PopoverBody>

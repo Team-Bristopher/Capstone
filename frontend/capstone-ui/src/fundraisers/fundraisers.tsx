@@ -1,14 +1,15 @@
-import { Grid, GridItem, Skeleton } from "@chakra-ui/react";
+import { SimpleGrid, Skeleton } from "@chakra-ui/react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { FunctionComponent, useCallback, useEffect } from "react";
-import { useInfiniteQuery } from "react-query";
 import { getFundraisers } from "../api/api-calls";
 import { Fundraiser as FundraiserComponent } from "../fundraiser/fundraiser";
 import { Fundraiser } from "../models/incoming/Fundraiser";
 
 // These props describe filtering options.
 interface FundraisersProps {
-   search?: string;
-   category?: number;
+   search: string;
+   category: number;
+   refresh: number;
 }
 
 export const Fundraisers: FunctionComponent<FundraisersProps> = (props: FundraisersProps) => {
@@ -39,85 +40,67 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
       refetch();
 
       // eslint-disable-next-line
-   }, [props]);
+   }, [props.refresh]);
 
    if (isFetching) {
       return (
-         <Grid
-            templateColumns="repeat(3, 1fr)"
+         <SimpleGrid
             overflow="auto"
-            display="flex"
             width="100%"
-            justifyContent="space-between"
+            columns={3}
+            spacing={110}
+            padding="0"
+            margin="0"
          >
-            <GridItem
-               w="100%"
-               h="auto"
-            >
-               <Skeleton
-                  width="25em"
-                  height="30em"
-               />
-            </GridItem>
-            <GridItem
-               w="100%"
-               h="auto"
-            >
-               <Skeleton
-                  width="25em"
-                  height="30em"
-               />
-            </GridItem>
-            <GridItem
-               w="100%"
-               h="auto"
-            >
-               <Skeleton
-                  width="25em"
-                  height="30em"
-               />
-            </GridItem>
-         </Grid>
+
+            <Skeleton
+               width="25em"
+               height="30em"
+            />
+
+            <Skeleton
+               width="25em"
+               height="30em"
+            />
+            <Skeleton
+               width="25em"
+               height="30em"
+            />
+         </SimpleGrid>
       );
    }
 
    return (
       <>
-         <Grid
-            templateColumns="repeat(3, 1fr)"
+         <SimpleGrid
             overflow="auto"
-            display="flex"
-            flexDir="row"
             width="100%"
-            justifyContent="space-between"
+            columns={3}
+            spacing={110}
+            padding="0"
+            margin="0"
          >
             {(data?.pages || []).map((fundraiserPage) => (
                <>
                   {(fundraiserPage.map((fundraiser: Fundraiser) => (
                      <>
-                        <GridItem
-                           w="100%"
-                           h="auto"
-                           key={fundraiser.id}
-                        >
-                           <FundraiserComponent
-                              ID={fundraiser.id}
-                              type={fundraiser.type}
-                              title={fundraiser.title}
-                              description={fundraiser.description}
-                              views={fundraiser.views}
-                              target={fundraiser.target}
-                              createdByID={fundraiser.createdBy}
-                              createdOn={fundraiser.createdOn}
-                              modifiedOn={fundraiser.modifiedOn}
-                              endDate={fundraiser.endDate}
-                           />
-                        </GridItem>
+                        <FundraiserComponent
+                           ID={fundraiser.id}
+                           type={fundraiser.type}
+                           title={fundraiser.title}
+                           description={fundraiser.description}
+                           views={fundraiser.views}
+                           target={fundraiser.target}
+                           createdByID={fundraiser.createdBy}
+                           createdOn={fundraiser.createdOn}
+                           modifiedOn={fundraiser.modifiedOn}
+                           endDate={fundraiser.endDate}
+                        />
                      </>
                   )))}
                </>
             ))}
-         </Grid>
+         </SimpleGrid>
       </>
    );
 } 
