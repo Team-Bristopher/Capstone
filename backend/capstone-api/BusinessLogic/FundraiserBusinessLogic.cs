@@ -364,7 +364,12 @@ namespace capstone_api.BusinessLogic
 
                     throw new HttpResponseException((int)HttpStatusCode.Forbidden);
                 }
-            } else
+            }
+
+            // Ensuring that anonymous donations
+            // are posted correctly with or without
+            // users being logged in.
+            if (message.IsAnonymous || userIDClaim == null)
             {
                 matchedUser = _authBusinessLogic.GetAnonymousUser();
             }

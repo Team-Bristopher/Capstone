@@ -1,5 +1,5 @@
 import { Box, Container, Link, Text, useToast } from "@chakra-ui/react";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiLogIn } from "react-icons/bi";
 import { BsEye, BsPerson } from "react-icons/bs";
@@ -32,13 +32,6 @@ export const Login: FunctionComponent = () => {
       reValidateMode: "onSubmit",
    });
 
-   const hasErrors = (): boolean => {
-      return (
-         formState.errors.email !== undefined ||
-         formState.errors.password !== undefined
-      );
-   }
-
    const sendLoginUserRequest = async () => {
       const values = getValues();
 
@@ -65,21 +58,11 @@ export const Login: FunctionComponent = () => {
       }
    }
 
-   useEffect(() => {
-      if (!formState.isSubmitting) {
-         return;
-      }
-
-      if (hasErrors()) {
-         return;
-      }
-
+   const onSubmit = () => {
       setIsLoadingOpen(true);
 
       sendLoginUserRequest();
-
-      // eslint-disable-next-line
-   }, [formState.isSubmitting]);
+   }
 
    return (
       <>
@@ -115,7 +98,14 @@ export const Login: FunctionComponent = () => {
                      >
                         Welcome to Project
                      </Text>
-                     <Text fontSize="2xl" fontWeight="bold" color="#D90429">R O M E,</Text>
+                     <Text
+                        fontSize="xl"
+                        marginRight="0.5em"
+                        fontWeight="bold"
+                        color="#D90429"
+                     >
+                        ROME
+                     </Text>
                   </Box>
                   <Text
                      fontSize="l"
@@ -131,7 +121,7 @@ export const Login: FunctionComponent = () => {
                   </Text>
                </Container>
             </Container>
-            <form onSubmit={handleSubmit(() => { })}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                <Container
                   width="auto"
                   maxWidth="35em"

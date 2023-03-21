@@ -21,7 +21,7 @@ export const Page: FunctionComponent<PageProps> = (props: PageProps) => {
         <Navbar />
         <Container
           width="100vw"
-          height="80vh"
+          height="95vh"
           padding="1rem"
           maxWidth="100vw"
           overflow="auto"

@@ -31,6 +31,11 @@ namespace capstone_api.IncomingMessages
 		public bool IsSavingPaymentInformation { get; set; } = false;
 
         /// <summary>
+        /// Indicates whether the donation is anonymous or not.
+        /// </summary>
+        public bool IsAnonymous { get; set; }
+
+        /// <summary>
         /// Nullable, default is empty.
         /// The donation message.
         /// </summary>

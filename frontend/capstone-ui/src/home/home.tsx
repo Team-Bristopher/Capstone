@@ -1,5 +1,5 @@
 import { Box, Container, Icon, Input, Select, Text } from "@chakra-ui/react";
-import { FunctionComponent, useContext } from "react";
+import { FunctionComponent, useContext, useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,10 @@ import { Button } from "../input/button";
 import { Page } from "../page/page";
 
 export const Home: FunctionComponent = () => {
+  const [searchValue, setSearchValue] = useState<string>();
+  const [categorySearch, setCategorySearch] = useState<number>();
+  const [filterRefresh, setFilterRefresh] = useState<number>();
+
   const authContext = useContext(AuthContext);
 
   const navigate = useNavigate();
@@ -18,7 +22,7 @@ export const Home: FunctionComponent = () => {
       <Page>
         <Container
           display="flex"
-          paddingLeft="11.45rem"
+          paddingLeft="8rem"
           paddingRight="8rem"
           width="100%"
           maxWidth="100%"
@@ -35,12 +39,12 @@ export const Home: FunctionComponent = () => {
         <Container
           display="flex"
           flexDir="row"
-          padding="2em"
-          paddingTop="1em"
-          paddingLeft="7rem"
-          paddingRight="7.85rem"
+          marginTop="1em"
+          paddingLeft="8rem"
+          paddingRight="8rem"
           width="100%"
           maxWidth="100%"
+          justifyContent="space-between"
         >
           {authContext.loggedInUser !== undefined &&
             <Button
@@ -49,18 +53,16 @@ export const Home: FunctionComponent = () => {
               variant="icon_text"
               icon={AiOutlinePlus}
               style={{
-                width: "18rem",
+                width: "16%",
               }}
               onClick={() => { navigate("fundraiser/create"); }}
             />
           }
           <Box
             margin="0"
-            width="100%"
-            maxWidth="100%"
+            width={(authContext.loggedInUser !== undefined) ? "80%" : "100%"}
+            maxWidth={(authContext.loggedInUser !== undefined) ? "80%" : "100%"}
             display="flex"
-            marginLeft="4.55rem"
-            marginRight="2.6rem"
             border="1px solid"
             borderColor="#8D99AE"
             borderRadius="5px"
@@ -77,8 +79,8 @@ export const Home: FunctionComponent = () => {
               }}
               padding="2px"
               marginLeft="0.1rem"
-              marginRight="-0.5rem"
               marginTop="0.1rem"
+              onClick={() => { setFilterRefresh(Date.now()); }}
             />
             <Input
               placeholder="Search for fundraisers..."
@@ -91,6 +93,7 @@ export const Home: FunctionComponent = () => {
                 "border": "0",
                 "borderColor": "none",
               }}
+              onChange={(event) => { setSearchValue(event.target.value); }}
             />
             <Select
               marginLeft="auto"
@@ -100,6 +103,7 @@ export const Home: FunctionComponent = () => {
               height="2rem"
               marginRight="0.05rem"
               fontWeight="bold"
+              onChange={(event) => { setCategorySearch(parseInt(event.target.value)); }}
             >
               <option value=''>All Categories</option>
               <option value='0'>Medical</option>
@@ -117,14 +121,13 @@ export const Home: FunctionComponent = () => {
         <Container
           display="flex"
           flexDir="row"
-          padding="2em"
-          paddingLeft="11.55rem"
-          paddingRight="8rem"
           width="100%"
           maxWidth="100%"
-          marginTop="-2.5rem"
+          paddingLeft="8rem"
+          paddingRight="8rem"
+          marginTop="1em"
         >
-          <Fundraisers />
+          <Fundraisers search={searchValue ?? ""} category={categorySearch ?? 0} refresh={filterRefresh ?? 0} />
         </Container>
       </Page>
     </>

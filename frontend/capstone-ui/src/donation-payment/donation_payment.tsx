@@ -1,5 +1,4 @@
 import { Box, Checkbox, Container, Icon, Popover, PopoverBody, PopoverContent, PopoverTrigger, Text, useToast } from "@chakra-ui/react";
-import { DevTool } from "@hookform/devtools";
 import { FunctionComponent, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiCreditCardFront } from "react-icons/bi";
@@ -8,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { donateToFundraiser } from "../api/api-calls";
 import { AuthContext } from "../globals/auth_context";
 import { CARDHOLDER_NAME_INVALID, CARDHOLDER_NAME_REGEX, CARDHOLDER_NAME_REQUIRED, CREDIT_CARD_INVALID, CREDIT_CARD_NUMBER_REGEX, CREDIT_CARD_NUMBER_REQUIRED, EXPIRATION_DATE_INVALID, EXPIRATION_DATE_REGEX, EXPIRATION_DATE_REQUIRED_ERROR, INVALID_EXPIRATION_DATE_ERROR, LONG_CARDHOLDER_NAME_ERROR, SECURITY_CODE_REGEX, SECURITY_CODE_REQUIRED_ERROR, SHORT_CARDHOLDER_NAME_ERROR } from "../globals/form_globals";
+import { formatCurrencyToString } from "../globals/helpers";
 import { Button } from "../input/button";
 import { TextInput } from "../input/textinput";
 import { LoadingDialog } from "../loading-dialog/loading_dialog";
@@ -20,6 +20,7 @@ enum PaymentPageFormNames {
    cardNumber = "cardNumber",
    expirationDate = "expirationDate",
    securityCode = "securityCode",
+   saveInformation = "saveInformation",
 }
 
 interface PaymentPageForm {
@@ -27,6 +28,7 @@ interface PaymentPageForm {
    cardNumber: string;
    expirationDate: string;
    securityCode: string;
+   saveInformation: boolean;
 }
 
 export const DonationPayment: FunctionComponent = () => {
@@ -50,6 +52,7 @@ export const DonationPayment: FunctionComponent = () => {
          fundraiserID: location.state.fundraiserID,
          message: location.state.donationMessage,
          amount: location.state.donationAmount,
+         isAnonymous: location.state.isAnonymous,
          userID: authContext.loggedInUser?.id === "" ? undefined : authContext.loggedInUser?.id,
          isSavingPaymentInformation: false, // TODO
          firstName: values.cardholderName.split(" ")[0],
@@ -105,26 +108,27 @@ export const DonationPayment: FunctionComponent = () => {
                   alignItems="center"
                   justifyContent="center"
                   width="100%"
+                  maxWidth="100%"
                   minHeight="5em"
                   marginBottom="1em"
                >
 
                   <Text
                      fontSize="2xl"
-                     marginRight="0.5em"
+                     marginRight="0.3em"
                   >
                      Donating
                   </Text>
-                  <Text fontSize="2xl" fontWeight="bold" color="#D90429">${location.state.donationAmount}</Text>
+                  <Text fontSize="2xl" fontWeight="bold" color="#D90429">{formatCurrencyToString(location.state.donationAmount)}</Text>
                   <Text
                      fontSize="2xl"
-                     marginLeft="0.5em"
+                     marginLeft="0.3em"
                   >
                      to
                   </Text>
                   <Text
                      fontSize="2xl"
-                     marginLeft="0.5em"
+                     marginLeft="0.3em"
                      fontWeight="bold"
                   >
                      {location.state.fundraiserTitle}
@@ -276,7 +280,7 @@ export const DonationPayment: FunctionComponent = () => {
                         <Checkbox
                            size="lg"
                            colorScheme="red"
-                        // {...register(DonationPopupFormNames.anonymousDonation)}
+                           {...register(PaymentPageFormNames.saveInformation)}
                         >
                            <Text
                               color="#2B2D42"
@@ -327,7 +331,6 @@ export const DonationPayment: FunctionComponent = () => {
                      }}
                   />
                </Container>
-               <DevTool control={control} />
             </form>
          </Page >
       </>

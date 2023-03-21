@@ -2,7 +2,7 @@ import { Box, Container, StackDivider, Text, VStack } from "@chakra-ui/react";
 import { FunctionComponent, useState } from "react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { AllDonationsPopup } from "../all-donations-popup/all_donations_popup";
-import { getRelativeTimeText } from "../globals/helpers";
+import { formatCurrencyToString, getRelativeTimeText } from "../globals/helpers";
 import { RomeDonationIcon } from "../icons/rome_donation_icon";
 import { Button } from "../input/button";
 import { FundraiserDonationMessage } from "../models/incoming/FundraiserDonationMessage";
@@ -54,7 +54,7 @@ export const RecentDonations: FunctionComponent<RecentDonationsProps> = (props: 
                         </Container>
                         <Container width="100%" padding="0" margin="0" maxWidth="100%" display="flex" flexDir="row" justifyContent="space-between">
                            <Text color="#2B2D42" fontWeight="bold">
-                              ${donation.individualAmount}
+                              {formatCurrencyToString(donation.individualAmount)}
                            </Text>
                            <Text color="#2B2D42">
                               {getRelativeTimeText(Date.now(), (new Date(donation.donatedAt)).getTime())}

@@ -60,6 +60,19 @@ export const PrivacyPolicy: FunctionComponent = () => {
                   fontWeight="bold"
                   marginBottom="1em"
                >
+                  PCI Compliance
+               </Text>
+               <Text
+                  fontSize="md"
+                  marginBottom="1em"
+               >
+                  Project ROME is committed to maintaining the security of all transactions made through our platform. While we follow the guidelines set forth by the Payment Card Industry Data Security Standards (PCI DSS) to ensure the protection of your payment information, please note that this is a demo application and therefore we cannot legally claim to be 100% PCI compliant. We take your security seriously and are constantly working to improve our platform's security measures.
+               </Text>
+               <Text
+                  fontSize="l"
+                  fontWeight="bold"
+                  marginBottom="1em"
+               >
                   Data Security
                </Text>
                <Text

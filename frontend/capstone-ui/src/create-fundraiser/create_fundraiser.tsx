@@ -1,5 +1,5 @@
 import { Box, Container, Text, useToast } from "@chakra-ui/react";
-import { FunctionComponent, useContext, useEffect, useState } from "react";
+import { FunctionComponent, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlinePlus } from "react-icons/ai";
 import { BiCalendar } from "react-icons/bi";
@@ -47,15 +47,6 @@ export const CreateFundraiser: FunctionComponent = () => {
       reValidateMode: "onChange",
    });
 
-   const hasErrors = (): boolean => {
-      return (
-         formState.errors.title !== undefined ||
-         formState.errors.description !== undefined ||
-         formState.errors.endDate !== undefined ||
-         formState.errors.fundraiserType !== undefined
-      );
-   }
-
    const sendCreateFundraiserRequest = async () => {
       const values = getValues();
 
@@ -82,21 +73,11 @@ export const CreateFundraiser: FunctionComponent = () => {
       }
    }
 
-   useEffect(() => {
-      if (!formState.isSubmitting) {
-         return;
-      }
-
-      if (hasErrors()) {
-         return;
-      }
-
+   const onSubmit = () => {
       setIsLoadingOpen(true);
 
       sendCreateFundraiserRequest();
-
-      // eslint-disable-next-line
-   }, [formState.isSubmitting]);
+   }
 
    if (!authContext || !authContext.loggedInUser) {
       return (
@@ -114,10 +95,9 @@ export const CreateFundraiser: FunctionComponent = () => {
             <LoadingDialog
                open={isLoadingOpen}
             />
-            <form onSubmit={handleSubmit(() => { })}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                <Container
                   display="flex"
-                  paddingTop="2em"
                   paddingLeft="8rem"
                   paddingRight="8rem"
                   width="100%"

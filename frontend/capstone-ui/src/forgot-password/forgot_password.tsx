@@ -1,5 +1,5 @@
 import { Box, Container, Text } from "@chakra-ui/react";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BsPerson } from "react-icons/bs";
 import { EMAIL_REGEX, EMAIL_TOO_LONG_ERROR, EMAIL_TOO_SHORT_ERROR, INVALID_EMAIL_ERROR, REQUIRED_FIELD_ERROR } from "../globals/form_globals";
@@ -22,26 +22,6 @@ export const ForgotPassword: FunctionComponent = () => {
       criteriaMode: "all",
       reValidateMode: "onSubmit",
    });
-
-   const hasErrors = (): boolean => {
-      return (
-         formState.errors.email !== undefined
-      );
-   }
-
-   useEffect(() => {
-      if (!formState.isSubmitting) {
-         return;
-      }
-
-      if (hasErrors()) {
-         return;
-      }
-
-      setIsLoadingOpen(true);
-
-      // eslint-disable-next-line
-   }, [formState.isSubmitting]);
 
    return (
       <>

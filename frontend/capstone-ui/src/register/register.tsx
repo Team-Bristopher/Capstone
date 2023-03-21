@@ -1,5 +1,5 @@
 import { Box, Container, Text, useToast } from "@chakra-ui/react";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiLogIn } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
@@ -37,15 +37,6 @@ export const RegisterPage: FunctionComponent = () => {
       reValidateMode: "onSubmit",
    });
 
-   const hasErrors = (): boolean => {
-      return (
-         formState.errors.firstName !== undefined ||
-         formState.errors.lastName !== undefined ||
-         formState.errors.password !== undefined ||
-         formState.errors.password_confirm !== undefined
-      );
-   }
-
    const passwordsDontMatch = (): boolean => {
       const values = getValues();
 
@@ -76,15 +67,7 @@ export const RegisterPage: FunctionComponent = () => {
       }
    }
 
-   useEffect(() => {
-      if (!formState.isSubmitting) {
-         return;
-      }
-
-      if (hasErrors()) {
-         return;
-      }
-
+   const onSubmit = () => {
       if (passwordsDontMatch()) {
          setError(RegisterPageFormNames.password, {
             message: PASSWORDS_DONT_MATCH,
@@ -100,9 +83,7 @@ export const RegisterPage: FunctionComponent = () => {
       setIsLoadingOpen(true);
 
       sendRegisterRequest();
-
-      // eslint-disable-next-line
-   }, [formState.isSubmitting]);
+   }
 
    return (
       <>
@@ -149,7 +130,7 @@ export const RegisterPage: FunctionComponent = () => {
                   </Box>
                </Container>
             </Container>
-            <form onSubmit={handleSubmit(() => { })}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                <Container
                   width="auto"
                   maxWidth="35em"

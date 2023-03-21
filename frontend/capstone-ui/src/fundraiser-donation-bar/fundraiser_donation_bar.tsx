@@ -1,6 +1,9 @@
 import { Box, Container, Progress, Text } from "@chakra-ui/react";
-import { FunctionComponent, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { FunctionComponent } from "react";
 import { getFundraiserAmount } from "../api/api-calls";
+import { formatCurrencyToString, getFormattedDateString } from "../globals/helpers";
+import { FundraiserDonationAmountMessage } from "../models/incoming/FundraiserDonationAmountMessage";
 import { DonationTimeSort } from "../recent-donations/recent_donations";
 
 interface FundraiserDonationBarProps {
@@ -10,27 +13,21 @@ interface FundraiserDonationBarProps {
 }
 
 export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps> = (props: FundraiserDonationBarProps) => {
-   const [isLoading, setIsLoading] = useState<boolean>(true);
-   const [donatedAmount, setDonatedAmount] = useState<number>(1);
-
-   const sendGetAmountRequest = async () => {
-      setIsLoading(true);
-
+   const fetchDonationInformation = async (): Promise<FundraiserDonationAmountMessage> => {
       const response = await getFundraiserAmount(DonationTimeSort.LATEST, props.fundraiserID);
 
       if (response === undefined) {
-         return;
+         throw new Error("Unable to fetch fundraiser donation");
       }
 
-      setDonatedAmount(response.totalAmount);
-      setIsLoading(false);
+      return response;
    }
 
-   useEffect(() => {
-      sendGetAmountRequest();
-
-      // eslint-disable-next-line
-   }, [props]);
+   const { data, isFetching } = useQuery({
+      queryKey: ["donation-amount", props.fundraiserID],
+      queryFn: fetchDonationInformation,
+      refetchOnWindowFocus: false,
+   });
 
    return (
       <>
@@ -55,10 +52,10 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
                <Progress
                   width="100%"
                   minHeight="1.7em"
-                  value={isLoading ? undefined : ((donatedAmount / props.fundraiserGoal) * 100)}
+                  value={isFetching ? undefined : (((data?.totalAmount ?? 1) / props.fundraiserGoal) * 100)}
                   isAnimated={true}
                   hasStripe={true}
-                  isIndeterminate={isLoading}
+                  isIndeterminate={isFetching}
                   borderRadius="7px"
                   backgroundColor="#D9D9D9"
                   colorScheme="red"
@@ -78,7 +75,7 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
                <Box
                   padding="0"
                   margin="0"
-                  width="50%"
+                  width="65%"
                   display="flex"
                   flexDir="row"
                >
@@ -89,7 +86,7 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
                      marginRight="0.3em"
                      marginTop="0.5em"
                   >
-                     ${donatedAmount}
+                     {formatCurrencyToString((data?.totalAmount ?? 1))}
                   </Text>
                   <Text
                      color="#2B2D42"
@@ -98,7 +95,7 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
                      marginRight="0.3em"
                      marginTop="0.5em"
                   >
-                     / ${props.fundraiserGoal}
+                     / {formatCurrencyToString(props.fundraiserGoal)}
                   </Text>
                </Box>
                <Box
@@ -106,7 +103,7 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
                   margin="0"
                   display="flex"
                   flexDir="row"
-                  width="50%"
+                  width="35%"
                >
                   <Text
                      color="#2B2D42"
@@ -116,7 +113,7 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
                      marginTop="0.5em"
                      marginLeft="auto"
                   >
-                     Ends {new Date(props.endDate).toDateString()}
+                     Ends {getFormattedDateString(new Date(props.endDate))}
                   </Text>
                </Box>
             </Container>

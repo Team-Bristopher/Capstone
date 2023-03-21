@@ -1,6 +1,6 @@
 import { Container, Skeleton, Text, VStack } from "@chakra-ui/react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { FunctionComponent, useCallback, useContext } from "react";
-import { useInfiniteQuery } from "react-query";
 import { getAllDonations } from "../api/api-calls";
 import { FundraiserContext } from "../fundraiser-detail/fundraiser_detail";
 import { getRelativeTimeText } from "../globals/helpers";
@@ -11,15 +11,19 @@ export const Comments: FunctionComponent = () => {
    const fundraiserContext = useContext(FundraiserContext);
 
    const fetchAllDonations = useCallback(async ({ pageParam = 0 }) => {
+      if (fundraiserContext === undefined) {
+         return [];
+      }
+
       const donationPage = await getAllDonations(fundraiserContext?.fundraiser.id ?? "", pageParam, true);
 
       return donationPage;
 
       // eslint-disable-next-line
-   }, []);
+   }, [fundraiserContext]);
 
    const { data, isFetching } = useInfiniteQuery<FundraiserDonationMessage[]>({
-      queryKey: ["all-donations-with-comments"],
+      queryKey: ["all-donations-with-comments", fundraiserContext?.fundraiser.id],
       queryFn: fetchAllDonations,
       refetchOnWindowFocus: false,
       getNextPageParam: (lastPage, pages) => {

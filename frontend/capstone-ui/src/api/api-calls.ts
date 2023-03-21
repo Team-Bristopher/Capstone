@@ -197,12 +197,14 @@ export const createFundraiser = (createFundraserMessage: CreateFundraiserMessage
 
           return {
             responseType: "success",
+            message: "Fundraiser was successfully created",
             fundraiserID: responseJson.fundraiserID,
           } as CreateFundraiserResponseMessage
         default:
           return {
             responseType: "error",
             fundraiserID: "",
+            message: "An unknown error has occured",
           } as CreateFundraiserResponseMessage
       }
     })

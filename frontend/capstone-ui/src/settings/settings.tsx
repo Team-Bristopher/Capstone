@@ -16,7 +16,6 @@ export const Settings: FunctionComponent = () => {
       <Page>
         <Container
           display="flex"
-          padding="2em"
           paddingLeft="8rem"
           paddingRight="8rem"
           width="100%"
