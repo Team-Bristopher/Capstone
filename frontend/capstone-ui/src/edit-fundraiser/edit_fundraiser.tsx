@@ -197,7 +197,9 @@ export const EditFundraiser: FunctionComponent = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
                <Container
                   display="flex"
-                  paddingTop="2em"
+                  flexWrap="wrap"
+                  alignContent="center"
+                  height="4em"
                   paddingLeft="8rem"
                   paddingRight="8rem"
                   width="100%"

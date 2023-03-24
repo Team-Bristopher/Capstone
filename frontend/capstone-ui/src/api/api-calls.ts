@@ -211,7 +211,7 @@ export const createFundraiser = (createFundraserMessage: CreateFundraiserMessage
 }
 
 export const getFundraisers = (page: number): Promise<Array<Fundraiser>> => {
-  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/`)
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser?page=${page}`)
     .then(async (resp) => {
       switch (resp.status) {
         case 200:

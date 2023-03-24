@@ -103,6 +103,9 @@ export const CreateFundraiser: FunctionComponent = () => {
                   width="100%"
                   maxWidth="100%"
                   justifyContent="space-between"
+                  flexWrap="wrap"
+                  alignContent="center"
+                  height="4em"
                >
                   <Text
                      fontSize="3xl"

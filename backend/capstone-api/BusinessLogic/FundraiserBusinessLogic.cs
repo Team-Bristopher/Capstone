@@ -252,6 +252,9 @@ namespace capstone_api.BusinessLogic
             // Getting the comment count for this fundraiser.
             long commentCount = _fundraiserDataAccess.GetFundraiserCommentCount(fundraiser.ID);
 
+            // Getting the donation count for this fundraiser.
+            long donationCount = _fundraiserDataAccess.GetFundraiserDonationCount(fundraiser.ID);
+
             // Returning the fundraiser message object.
             return new FundraiserMessage
             {
@@ -266,6 +269,7 @@ namespace capstone_api.BusinessLogic
                 Target = fundraiser.Target,
                 EndDate = fundraiser.EndDate,
                 CommentCount = commentCount,
+                DonationCount = donationCount,
                 Author = new UserMessage
                 {
                     FirstName = fundraiser.CreatedByUser.FirstName,

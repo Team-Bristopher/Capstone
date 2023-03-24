@@ -22,7 +22,6 @@ export const Page: FunctionComponent<PageProps> = (props: PageProps) => {
         <Container
           width="100vw"
           height="95vh"
-          padding="1rem"
           maxWidth="100vw"
           overflow="auto"
         >

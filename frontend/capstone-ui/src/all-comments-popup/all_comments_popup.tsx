@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Container, Divider, IconButton, Skeleton, Text, VStack } from "@chakra-ui/react";
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Container, Divider, IconButton, Skeleton, Text, VStack } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { FunctionComponent, useCallback, useContext, useRef, useState } from "react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
@@ -8,11 +8,12 @@ import { FundraiserContext } from "../fundraiser-detail/fundraiser_detail";
 import { formatCurrencyToString, getRelativeTimeText } from "../globals/helpers";
 import { RomeDonationIcon } from "../icons/rome_donation_icon";
 
-interface AllDonationsPopupProps {
+interface AllCommentsPopupProps {
    onClose: () => void;
+   isOpen: boolean;
 }
 
-export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (props: AllDonationsPopupProps) => {
+export const AllCommentsPopup: FunctionComponent<AllCommentsPopupProps> = (props: AllCommentsPopupProps) => {
    const [currentPage, setCurrentPage] = useState<number>(0);
 
    const cancelRef = useRef(null);
@@ -20,24 +21,28 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
    const fundraiserContext = useContext(FundraiserContext);
 
    const fetchAllDonations = useCallback(async () => {
-      const donationPage = await getAllDonations(fundraiserContext?.fundraiser.id ?? "", currentPage);
+      if (fundraiserContext === undefined) {
+         return [];
+      }
+
+      const donationPage = await getAllDonations(fundraiserContext?.fundraiser.id ?? "", currentPage, true);
 
       return donationPage;
 
       // eslint-disable-next-line
-   }, [props, currentPage]);
+   }, [fundraiserContext, currentPage]);
 
-   const getTotalDonations = (): number => {
-      if (fundraiserContext === undefined || fundraiserContext.fundraiser === undefined) {
+   const getTotalComments = (): number => {
+      if (fundraiserContext === undefined || fundraiserContext?.fundraiser === undefined) {
          return 0;
       }
 
-      return fundraiserContext.fundraiser.donationCount;
+      return fundraiserContext.fundraiser.commentCount;
    }
 
    const { data, isFetching } = useQuery({
-      queryKey: ["all-donations-popup", currentPage],
       queryFn: fetchAllDonations,
+      queryKey: ["all-comments-popup", currentPage],
       refetchOnWindowFocus: false,
    });
 
@@ -46,7 +51,7 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
          return false;
       }
 
-      if (Math.floor(getTotalDonations() / 6) > currentPage) {
+      if (Math.floor(getTotalComments() / 6) > currentPage) {
          return true;
       }
 
@@ -70,8 +75,8 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
          <>
             <AlertDialog
                motionPreset="slideInBottom"
-               onClose={() => { }}
-               isOpen={true}
+               onClose={props.onClose}
+               isOpen={props.isOpen}
                leastDestructiveRef={cancelRef}
                isCentered
             >
@@ -92,7 +97,7 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
                      <Text
                         width="75%"
                      >
-                        All Donations to {fundraiserContext?.fundraiser.title ?? ""}
+                        All comments to {fundraiserContext?.fundraiser.title ?? ""}
                      </Text>
                      <IconButton
                         icon={<VscClose />}
@@ -139,7 +144,8 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
          <AlertDialog
             motionPreset="slideInBottom"
             onClose={() => { }}
-            isOpen={true}
+            isOpen={props.isOpen}
+            onCloseComplete={props.onClose}
             leastDestructiveRef={cancelRef}
             isCentered
          >
@@ -160,7 +166,7 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
                   <Text
                      width="75%"
                   >
-                     All Donations to {fundraiserContext?.fundraiser.title ?? ""}
+                     All Comments to {fundraiserContext?.fundraiser.title ?? ""}
                   </Text>
                   <IconButton
                      icon={<VscClose />}
@@ -177,33 +183,104 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
                <AlertDialogBody
                   padding="0.7em"
                >
-                  {(data || []).map((donation, idx) => (
-                     <>
-                        <Box h='auto' display="flex" flexDir="row" padding="0.3em" maxW="100%" width="100%">
-                           <Container width="10%" padding="0" margin="0">
-                              <RomeDonationIcon />
-                           </Container>
-                           <Container width="100%" maxWidth="100%" padding="0" margin="0" display="flex" flexDir="column">
-                              <Container width="100%" padding="0" margin="0">
-                                 <Text color="#2B2D42">
-                                    {donation.firstName + " " + donation.lastName}
-                                 </Text>
+                  <VStack
+                     width="100%"
+                     height="100%"
+                     spacing={6}
+                     marginBottom="1em"
+                  >
+                     {(data || []).map((comment, idx) => (
+                        <>
+                           <Container
+                              maxW="100%"
+                              w="100%"
+                              display="flex"
+                              flexDir="row"
+                              margin="0"
+                              padding="0"
+                           >
+                              <Container
+                                 padding="0"
+                                 margin="0"
+                                 width="auto"
+                              >
+                                 <RomeDonationIcon />
                               </Container>
-                              <Container width="100%" padding="0" margin="0" maxWidth="100%" display="flex" flexDir="row" justifyContent="space-between">
-                                 <Text color="#2B2D42" fontWeight="bold">
-                                    {formatCurrencyToString(donation.individualAmount)}
-                                 </Text>
-                                 <Text color="#2B2D42">
-                                    {getRelativeTimeText(Date.now(), (new Date(donation.donatedAt)).getTime())}
-                                 </Text>
+                              <Container
+                                 margin="0"
+                                 padding="0"
+                                 display="flex"
+                                 flexDir="column"
+                                 maxW="100%"
+                                 w="100%"
+                              >
+                                 <Container
+                                    maxW="100%"
+                                    w="100%"
+                                    display="flex"
+                                    flexDir="row"
+                                    margin="0"
+                                    padding="0"
+                                 >
+                                    <Container
+                                       padding="0"
+                                       margin="0"
+                                       marginLeft="1em"
+                                    >
+                                       {comment.firstName + " " + comment.lastName}
+                                    </Container>
+                                    <Container
+                                       padding="0"
+                                       margin="0"
+                                       marginLeft="auto"
+                                       width="auto"
+                                    >
+                                       {getRelativeTimeText(Date.now(), (new Date(comment.donatedAt)).getTime())}
+                                    </Container>
+                                 </Container>
+                                 <Container
+                                    maxW="100%"
+                                    w="100%"
+                                    display="flex"
+                                    flexDir="row"
+                                    margin="0"
+                                    padding="0"
+                                 >
+                                    <Container
+                                       padding="0"
+                                       margin="0"
+                                       marginLeft="1em"
+                                    >
+                                       <Text
+                                          fontWeight="bold"
+                                       >
+                                          {formatCurrencyToString(comment.individualAmount)}
+                                       </Text>
+                                    </Container>
+                                 </Container>
+                                 <Container
+                                    maxW="100%"
+                                    w="100%"
+                                    display="flex"
+                                    flexDir="row"
+                                    margin="0"
+                                    padding="0"
+                                    maxHeight="2em"
+                                    textOverflow="ellipsis"
+                                    overflow="hidden"
+                                    whiteSpace="nowrap"
+                                    marginLeft="1em"
+                                 >
+                                    {comment.message}
+                                 </Container>
                               </Container>
                            </Container>
-                        </Box>
-                        {(idx !== (data?.length || 0) - 1) && (
-                           <Divider />
-                        )}
-                     </>
-                  ))}
+                           {(idx !== (data?.length || 0) - 1) && (
+                              <Divider />
+                           )}
+                        </>
+                     ))}
+                  </VStack>
                </AlertDialogBody>
                <AlertDialogFooter
                   backgroundColor="#2B2D42"
@@ -229,7 +306,7 @@ export const AllDonationsPopup: FunctionComponent<AllDonationsPopupProps> = (pro
                      }}
                   />
                   <Text>
-                     Page {currentPage} out of {Math.floor(getTotalDonations() / 6)}
+                     Page {currentPage} out of {Math.floor(getTotalComments() / 6)}
                   </Text>
                   <IconButton
                      marginLeft="1em"

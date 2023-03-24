@@ -96,6 +96,13 @@ namespace capstone_api.DataAccessLayer
 		/// <param name="fundraiserID">The ID of the fundraiser.</param>
 		/// <returns>The amount of comments.</returns>
 		public long GetFundraiserCommentCount(Guid fundraiserID);
+
+		/// <summary>
+		/// Gets the amount of donations a fundraiser has.
+		/// </summary>
+		/// <param name="fundraiserID">The ID of the fundraiser.</param>
+		/// <returns>The amount of donations.</returns>
+		public long GetFundraiserDonationCount(Guid fundraiserID);
 	}
 
 	/// <inheritdoc />
@@ -208,18 +215,18 @@ namespace capstone_api.DataAccessLayer
 					.Where(a => a.FundraiserID.Equals(fundraiser))
 					.Where(a => !string.IsNullOrEmpty(a.Message))
 					.Include(a => a.DonatedBy)
-					.Skip(page * 6)
+                    .OrderByDescending(a => a.DonatedOn)
+                    .Skip(page * 6)
 					.Take(6)
-					.OrderByDescending(a => a.DonatedOn)
 					.ToList();
             }
 
 			return _databaseContext.Donations
 				.Where(a => a.FundraiserID.Equals(fundraiser))
                 .Include(a => a.DonatedBy)
+                .OrderByDescending(a => a.DonatedOn)
                 .Skip(page * 6)
                 .Take(6)
-                .OrderBy(a => a.DonatedOn)
                 .ToList();
         }
 
@@ -306,6 +313,15 @@ namespace capstone_api.DataAccessLayer
 			return _databaseContext.Donations
 				.Where(a => a.FundraiserID.Equals(fundraiserID))
 				.Where(a => !string.IsNullOrEmpty(a.Message))
+				.Distinct()
+				.Count();
+		}
+
+		/// <inheritdoc />
+        public long GetFundraiserDonationCount(Guid fundraiserID)
+		{
+			return _databaseContext.Donations
+				.Where(a => a.FundraiserID.Equals(fundraiserID))
 				.Distinct()
 				.Count();
 		}

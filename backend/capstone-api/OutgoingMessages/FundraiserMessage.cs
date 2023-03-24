@@ -67,6 +67,11 @@ namespace capstone_api.OutgoingMessages
 		/// The amount of comments this fundraiser has.
 		/// </summary>
 		public long CommentCount { get; set; }
+
+		/// <summary>
+		/// The amount of donations this fundraiser has.
+		/// </summary>
+		public long DonationCount { get; set; }
 	}
 }
 
