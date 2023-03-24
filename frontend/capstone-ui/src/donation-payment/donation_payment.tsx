@@ -40,7 +40,7 @@ export const DonationPayment: FunctionComponent = () => {
 
    const [isLoading, setIsLoading] = useState<boolean>(false);
 
-   const { register, getValues, formState, handleSubmit, control } = useForm<PaymentPageForm>({
+   const { register, getValues, formState, handleSubmit } = useForm<PaymentPageForm>({
       criteriaMode: "all",
       reValidateMode: "onSubmit",
    });

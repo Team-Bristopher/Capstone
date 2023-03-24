@@ -16,6 +16,8 @@ interface ForgotPasswordForm {
 }
 
 export const ForgotPassword: FunctionComponent = () => {
+   // TODO: this functionality.
+   // eslint-disable-next-line
    const [isLoadingOpen, setIsLoadingOpen] = useState<boolean>(false);
 
    const { register, formState } = useForm<ForgotPasswordForm>({
