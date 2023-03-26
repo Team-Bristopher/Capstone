@@ -44,6 +44,7 @@ const generateMockFundraiser = (): Fundraiser => {
          lastName: faker.name.lastName(),
       },
       commentCount: 0,
+      donationCount: 0,
    };
 }
 

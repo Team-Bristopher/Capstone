@@ -16,4 +16,5 @@ export interface Fundraiser {
    endDate: Date;
    author: UserMessage;
    commentCount: number;
+   donationCount: number;
 }

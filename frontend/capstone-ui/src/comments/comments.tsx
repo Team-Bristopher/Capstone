@@ -1,13 +1,17 @@
 import { Container, Skeleton, Text, VStack } from "@chakra-ui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { FunctionComponent, useCallback, useContext } from "react";
+import { FunctionComponent, useCallback, useContext, useState } from "react";
+import { AllCommentsPopup } from "../all-comments-popup/all_comments_popup";
 import { getAllDonations } from "../api/api-calls";
 import { FundraiserContext } from "../fundraiser-detail/fundraiser_detail";
-import { getRelativeTimeText } from "../globals/helpers";
+import { formatCurrencyToString, getRelativeTimeText } from "../globals/helpers";
 import { RomeDonationIcon } from "../icons/rome_donation_icon";
+import { Button } from "../input/button";
 import { FundraiserDonationMessage } from "../models/incoming/FundraiserDonationMessage";
 
 export const Comments: FunctionComponent = () => {
+   const [isAllCommentsPopupOpen, setIsAllCommentsPopupOpen] = useState<boolean>(false);
+
    const fundraiserContext = useContext(FundraiserContext);
 
    const fetchAllDonations = useCallback(async ({ pageParam = 0 }) => {
@@ -37,6 +41,14 @@ export const Comments: FunctionComponent = () => {
       },
    });
 
+   const getTotalComments = (): number => {
+      if (fundraiserContext === undefined || fundraiserContext?.fundraiser === undefined) {
+         return 0;
+      }
+
+      return fundraiserContext.fundraiser.commentCount;
+   }
+
    if (isFetching) {
       return (
          <>
@@ -56,12 +68,14 @@ export const Comments: FunctionComponent = () => {
 
    return (
       <>
+         <AllCommentsPopup isOpen={isAllCommentsPopupOpen} onClose={() => { setIsAllCommentsPopupOpen(false); }} />
          {(data?.pages || []).map(commentPage => (
             <>
                <VStack
                   width="100%"
                   height="100%"
                   spacing={6}
+                  marginBottom="1em"
                >
                   {(commentPage.map((comment) => (
 
@@ -128,7 +142,7 @@ export const Comments: FunctionComponent = () => {
                                  <Text
                                     fontWeight="bold"
                                  >
-                                    ${comment.individualAmount}
+                                    {formatCurrencyToString(comment.individualAmount)}
                                  </Text>
                               </Container>
                            </Container>
@@ -150,6 +164,22 @@ export const Comments: FunctionComponent = () => {
                         </Container>
                      </Container>
                   )))}
+                  {(getTotalComments() > 6) && (
+                     <Container
+                        maxWidth="100%"
+                        width="100%"
+                        display="flex"
+                        alignContent="center"
+                        justifyContent="start"
+                     >
+                        <Button
+                           label="See all"
+                           ariaLabel="See all comments button"
+                           onClick={() => { setIsAllCommentsPopupOpen(true); }}
+                           variant="text_only"
+                        />
+                     </Container>
+                  )}
                </VStack>
             </>
          ))}

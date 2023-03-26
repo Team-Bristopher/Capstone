@@ -40,6 +40,7 @@ export const Home: FunctionComponent = () => {
           display="flex"
           flexDir="row"
           marginTop="1em"
+          marginBottom="1em"
           paddingLeft="8rem"
           paddingRight="8rem"
           width="100%"
@@ -118,17 +119,7 @@ export const Home: FunctionComponent = () => {
             </Select>
           </Box>
         </Container>
-        <Container
-          display="flex"
-          flexDir="row"
-          width="100%"
-          maxWidth="100%"
-          paddingLeft="8rem"
-          paddingRight="8rem"
-          marginTop="1em"
-        >
-          <Fundraisers search={searchValue ?? ""} category={categorySearch ?? 0} refresh={filterRefresh ?? 0} />
-        </Container>
+        <Fundraisers search={searchValue ?? ""} category={categorySearch ?? 0} refresh={filterRefresh ?? 0} />
       </Page>
     </>
   );

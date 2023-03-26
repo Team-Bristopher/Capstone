@@ -1,8 +1,9 @@
-import { SimpleGrid, Skeleton } from "@chakra-ui/react";
+import { Container, SimpleGrid, Skeleton } from "@chakra-ui/react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { FunctionComponent, useCallback, useEffect } from "react";
 import { getFundraisers } from "../api/api-calls";
 import { Fundraiser as FundraiserComponent } from "../fundraiser/fundraiser";
+import { Button } from "../input/button";
 import { Fundraiser } from "../models/incoming/Fundraiser";
 
 // These props describe filtering options.
@@ -16,12 +17,14 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
    const fetchFundraisers = useCallback(async ({ pageParam = 0 }) => {
       const fundraisers = await getFundraisers(pageParam);
 
+
+
       return fundraisers;
 
       // eslint-disable-next-line
    }, [props]);
 
-   const { data, isFetching, refetch } = useInfiniteQuery<Fundraiser[]>({
+   const { data, isFetching, fetchNextPage, hasNextPage, refetch } = useInfiniteQuery<Fundraiser[]>({
       queryKey: ["fundraisers"],
       queryFn: fetchFundraisers,
       refetchOnWindowFocus: false,
@@ -47,8 +50,9 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
          <SimpleGrid
             overflow="auto"
             width="100%"
+            maxW="100%"
             columns={3}
-            spacing={110}
+            spacing={50}
             padding="0"
             margin="0"
          >
@@ -73,12 +77,15 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
    return (
       <>
          <SimpleGrid
-            overflow="auto"
             width="100%"
+            height="auto"
             columns={3}
-            spacing={110}
+            spacing={50}
             padding="0"
             margin="0"
+            maxHeight="none"
+            maxWidth="none"
+            marginBottom="1em"
          >
             {(data?.pages || []).map((fundraiserPage) => (
                <>
@@ -101,6 +108,23 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
                </>
             ))}
          </SimpleGrid>
+         {hasNextPage && (
+            <Container
+               maxWidth="100%"
+               width="100%"
+               display="flex"
+               alignContent="center"
+               justifyContent="center"
+               marginBottom="1em"
+            >
+               <Button
+                  label="Load More"
+                  ariaLabel="Load more button"
+                  onClick={() => { fetchNextPage(); }}
+                  variant="text_only"
+               />
+            </Container>
+         )}
       </>
    );
 } 

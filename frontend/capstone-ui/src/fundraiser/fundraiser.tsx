@@ -67,8 +67,10 @@ export const Fundraiser: FunctionComponent<FundraiserProps> = (props: Fundraiser
                   fontSize="1.2rem"
                   fontWeight="bold"
                   marginTop="0.5em"
-                  maxWidth="90%"
+                  maxWidth="80%"
+                  overflow="hidden"
                   textOverflow="ellipsis"
+                  whiteSpace="nowrap"
                >
                   {props.title}
                </Text>
@@ -98,7 +100,6 @@ export const Fundraiser: FunctionComponent<FundraiserProps> = (props: Fundraiser
                      margin="0"
                      padding="0"
                      minHeight="10%"
-                     maxHeight="10%"
                      width="100%"
                      display="flex"
                      flexDir="row"
