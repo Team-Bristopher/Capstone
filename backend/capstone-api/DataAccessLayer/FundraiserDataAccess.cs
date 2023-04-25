@@ -43,12 +43,14 @@ namespace capstone_api.DataAccessLayer
 		/// <param name="message">The information by which to edit the fundraiser.</param>
 		public void EditFundraiser(Guid fundraiserID, EditFundraiserMessage message);
 
-		/// <summary>
-		/// Gets the fundraiser feed.
-		/// </summary>
-		/// <param name="page">The current page, used for pagination.</param>
-		/// <returns>The list of fundraisers.</returns>
-		public List<Fundraiser> GetFundraisers(int page);
+        /// <summary>
+        /// Gets the fundraiser feed.
+        /// </summary>
+        /// <param name="page">The current page, used for pagination.</param>
+        /// <param name="fundraiserTitle">Optional. The filter term for the fundraiser title.</param>
+        /// <param name="fundraiserCategory">Optional. The filter term for the fundraiser category.</param>
+        /// <returns>The list of fundraisers.</returns>
+        public List<Fundraiser> GetFundraisers(int page, string? fundraiserTitle, int? fundraiserCategory);
 
         /// <summary>
         /// Gets the donations feed.
@@ -103,6 +105,27 @@ namespace capstone_api.DataAccessLayer
 		/// <param name="fundraiserID">The ID of the fundraiser.</param>
 		/// <returns>The amount of donations.</returns>
 		public long GetFundraiserDonationCount(Guid fundraiserID);
+
+		/// <summary>
+		/// Saves the URL of the image regarding a fundraiser that has been uploaded.
+		/// </summary>
+		/// <param name="fundraiserID">The ID of the fundraiser.</param>
+		/// <param name="imageURL">The image that has been uploaded to S3.</param>
+		public void SaveFundraiserImageURL(Guid fundraiserID, string imageURL);
+
+		/// <summary>
+		/// Gets the list of images uploaded regarding this fundraiser.
+		/// </summary>
+		/// <param name="fundraiserID"></param>
+		/// <returns></returns>
+		public List<FundraiserImages> GetFundraiserImages(Guid fundraiserID);
+
+		/// <summary>
+		/// Removes the list of images that are being replaced
+		/// during a fundraiser edit.
+		/// </summary>
+		/// <param name="fundraiserID">The ID of the fundraiser.</param>
+		public void RemoveFundraiserImages(Guid fundraiserID);
 	}
 
 	/// <inheritdoc />
@@ -196,14 +219,30 @@ namespace capstone_api.DataAccessLayer
 		}
 
         /// <inheritdoc />
-        public List<Fundraiser> GetFundraisers(int page)
+        public List<Fundraiser> GetFundraisers(int page, string? fundraiserTitle, int? fundraiserCategory)
 		{
-			return _databaseContext.Fundraisers
+			IQueryable<Fundraiser> fundraisers = _databaseContext.Fundraisers;
+
+			if (!string.IsNullOrWhiteSpace(fundraiserTitle))
+			{
+				fundraisers = fundraisers
+					.Where(a => a.Title.Contains(fundraiserTitle));
+			}
+
+			if (fundraiserCategory.HasValue)
+			{
+				fundraisers = fundraisers
+					.Include(a => a.Type)
+					.Where(a => (int)a.Type.Type == fundraiserCategory.Value);
+			}
+
+            return fundraisers
 				.Include(a => a.Type)
+                .Include(a => a.FundraiserImages)
+                .OrderByDescending(a => a.CreatedOn)
                 .Skip(page * 6)
                 .Take(6)
-				.OrderBy(a => a.CreatedOn)
-				.ToList();
+                .ToList();
 		}
 
 		/// <inheritdoc />
@@ -324,6 +363,54 @@ namespace capstone_api.DataAccessLayer
 				.Where(a => a.FundraiserID.Equals(fundraiserID))
 				.Distinct()
 				.Count();
+		}
+
+		/// <inheritdoc />
+        public void SaveFundraiserImageURL(Guid fundraiserID, string imageURL)
+		{
+			Fundraiser matchedFundraiser = _databaseContext.Fundraisers
+				.Where(a => a.ID.Equals(fundraiserID))
+				.First();
+
+			FundraiserImages fundraiserImages = new FundraiserImages
+			{
+				Fundraiser = matchedFundraiser,
+				FundraiserID = matchedFundraiser.ID,
+				FundraiserImageURL = imageURL,
+				ID = Guid.NewGuid(),
+				UploadedAt = DateTime.UtcNow,
+			};
+
+			_databaseContext.Add(fundraiserImages);
+
+			_databaseContext.SaveChanges();
+		}
+
+		/// <inheritdoc />
+        public List<FundraiserImages> GetFundraiserImages(Guid fundraiserID)
+		{
+			return _databaseContext.FundraiserImages
+				.Where(a => a.FundraiserID.Equals(fundraiserID))
+				.OrderBy(a => a.UploadedAt)
+				.ToList();
+		}
+
+		/// <inheritdoc />
+        public void RemoveFundraiserImages(Guid fundraiserID)
+		{
+			List<FundraiserImages> existingImages = _databaseContext.FundraiserImages
+				.Where(a => a.FundraiserID.Equals(fundraiserID))
+				.ToList();
+
+			if (existingImages.Count > 0)
+			{
+				existingImages.ForEach((image) =>
+				{
+					_databaseContext.Remove(image);
+				});
+			}
+
+			_databaseContext.SaveChanges();
 		}
     }
 }

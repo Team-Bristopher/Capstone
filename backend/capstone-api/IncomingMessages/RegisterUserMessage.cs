@@ -30,7 +30,7 @@ namespace capstone_api.IncomingMessages
         /// </summary>
         [Required]
         [MinLength(3)]
-        [MaxLength(25)]
+        [MaxLength(75)]
         public string EmailAddress { get; set; }
 
         /// <summary>

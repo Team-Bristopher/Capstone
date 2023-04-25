@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Security.Claims;
+using Amazon.Runtime;
+using Amazon.S3;
+using Amazon.S3.Transfer;
 using capstone_api.DataAccessLayer;
 using capstone_api.IncomingMessages;
 using capstone_api.Models.Constants;
@@ -40,8 +43,10 @@ namespace capstone_api.BusinessLogic
         /// Gets the fundraiser feed.
         /// </summary>
         /// <param name="page">The current page, used for pagination.</param>
+        /// <param name="fundraiserTitle">Optional. The filter term for the fundraiser title.</param>
+        /// <param name="fundraiserCategory">Optional. The filter term for the fundraiser category.</param>
         /// <returns>The list of fundraisers.</returns>
-        public IEnumerable<FundraiserMessage> GetFundraisers(int page);
+        public IEnumerable<FundraiserMessage> GetFundraisers(int page, string? fundraiserTitle, int? fundraiserCategory);
 
         /// <summary>
         /// Gets the donations feed.
@@ -70,47 +75,64 @@ namespace capstone_api.BusinessLogic
         /// </summary>
         /// <param name="message">Information about the donation.</param>
         public void DonateToFundraiser(DonateToFundraiserMessage message);
+
+        /// <summary>
+        /// Uploads image to S3 and relates it to the fundraiser.
+        /// </summary>
+        /// <param name="fundraiserID">The ID of the fundraiser.</param>
+        /// <param name="formFile">The image file.</param>
+        public Task UploadImagesToFundraiser(Guid fundraiserID, IFormFile formFile);
+
+        /// <summary>
+        /// Removes the list of images that are being replaced
+        /// during a fundraiser edit.
+        /// </summary>
+        /// <param name="fundraiserID">The ID of the fundraiser.</param>
+        public void RemoveFundraiserImages(Guid fundraiserID);
     }
 
     /// <inheritdoc />
     public class FundraiserBusinessLogic : IFundraiserBusinessLogic
-	{
-		private readonly ILogger<FundraiserBusinessLogic> _logger;
-		private readonly IFundraiserDataAccess _fundraiserDataAccess;
+    {
+        private readonly ILogger<FundraiserBusinessLogic> _logger;
+        private readonly IFundraiserDataAccess _fundraiserDataAccess;
         private IHttpContextAccessor _httpContext;
-		private IAuthBusinessLogic _authBusinessLogic;
+        private IAuthBusinessLogic _authBusinessLogic;
+        private readonly IConfiguration _config;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public FundraiserBusinessLogic(
-			IFundraiserDataAccess fundraiserDataAccess,
-			ILogger<FundraiserBusinessLogic> logger,
-			IHttpContextAccessor httpContextAccessor,
-			IAuthBusinessLogic authBusinessLogic)
-		{
-			_fundraiserDataAccess = fundraiserDataAccess;
-			_logger = logger;
-			_httpContext = httpContextAccessor;
-			_authBusinessLogic = authBusinessLogic;
-		}
+            IFundraiserDataAccess fundraiserDataAccess,
+            ILogger<FundraiserBusinessLogic> logger,
+            IHttpContextAccessor httpContextAccessor,
+            IAuthBusinessLogic authBusinessLogic,
+            IConfiguration configuration)
+        {
+            _fundraiserDataAccess = fundraiserDataAccess;
+            _logger = logger;
+            _httpContext = httpContextAccessor;
+            _authBusinessLogic = authBusinessLogic;
+            _config = configuration;
+        }
 
-		/// <inheritdoc />
+        /// <inheritdoc />
         public FundraiserDonationAmountMessage GetFundraiserDonations(DonationTimeSort sortOption, Guid fundraiserID)
-		{
-			// Ensuring the fundraiser exists based upon the ID.
-			Fundraiser? fundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
+        {
+            // Ensuring the fundraiser exists based upon the ID.
+            Fundraiser? fundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
 
-			// If the fundraiser doesn't exist.
-			if (fundraiser == null)
-			{
-				_logger.LogError($"Fundraiser is not found while fetching fundraiser with ID [{fundraiserID}]");
+            // If the fundraiser doesn't exist.
+            if (fundraiser == null)
+            {
+                _logger.LogError($"Fundraiser is not found while fetching fundraiser with ID [{fundraiserID}]");
 
-				throw new HttpResponseException((int)HttpStatusCode.NotFound);
-			}
+                throw new HttpResponseException((int)HttpStatusCode.NotFound);
+            }
 
-			// Grabbing the total amount of money donated to a fundraiser.
-			double amount = _fundraiserDataAccess.GetDonatedAmount(fundraiserID);
+            // Grabbing the total amount of money donated to a fundraiser.
+            double amount = _fundraiserDataAccess.GetDonatedAmount(fundraiserID);
 
             // Grabbing the most recent donations to this fundraiser.
             List<Donation> recentDonations = _fundraiserDataAccess.GetRecentDonations(sortOption, fundraiserID);
@@ -126,11 +148,11 @@ namespace capstone_api.BusinessLogic
                     DonatedAt = a.DonatedOn,
                 }).ToList()
             };
-		}
+        }
 
-		/// <inheritdoc />
-		public CreateFundraiserResponseMessage CreateFundraiser(CreateFundraiserMessage message)
-		{
+        /// <inheritdoc />
+        public CreateFundraiserResponseMessage CreateFundraiser(CreateFundraiserMessage message)
+        {
             Claim? userIDClaim = _httpContext.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "ID");
 
             // If the user claim is not found, or otherwise it doesn't exist.
@@ -155,12 +177,13 @@ namespace capstone_api.BusinessLogic
                 throw new HttpResponseException((int)HttpStatusCode.Forbidden);
             }
 
+            // Creating the fundraiser.
             Guid fundraiserID = _fundraiserDataAccess.CreateFundraiser(message, userID);
 
-			return new CreateFundraiserResponseMessage
-			{
-				FundraiserID = fundraiserID,
-			};
+            return new CreateFundraiserResponseMessage
+            {
+                FundraiserID = fundraiserID,
+            };
         }
 
         /// <inheritdoc />
@@ -213,10 +236,10 @@ namespace capstone_api.BusinessLogic
         }
 
         /// <inheritdoc />
-        public IEnumerable<FundraiserMessage> GetFundraisers(int page)
+        public IEnumerable<FundraiserMessage> GetFundraisers(int page, string? fundraiserTitle, int? fundraiserCategory)
         {
             // Grabbing the fundraiser page.
-            List<Fundraiser> fundraisers = _fundraiserDataAccess.GetFundraisers(page);
+            List<Fundraiser> fundraisers = _fundraiserDataAccess.GetFundraisers(page, fundraiserTitle, fundraiserCategory);
 
             // For every fundraiser found,
             // return as a message object.
@@ -226,6 +249,7 @@ namespace capstone_api.BusinessLogic
                 Title = a.Title,
                 Description = a.Description,
                 Views = _fundraiserDataAccess.GetFundraiserViews(a.ID),
+                ImageURLs = _fundraiserDataAccess.GetFundraiserImages(a.ID).Select(image => image.FundraiserImageURL).ToList(),
                 CreatedOn = a.CreatedOn,
                 ModifiedOn = a.ModifiedOn,
                 CreatedBy = a.CreatedByUserID,
@@ -255,6 +279,9 @@ namespace capstone_api.BusinessLogic
             // Getting the donation count for this fundraiser.
             long donationCount = _fundraiserDataAccess.GetFundraiserDonationCount(fundraiser.ID);
 
+            // Getting fundraiser images.
+            List<string> imageURLs = _fundraiserDataAccess.GetFundraiserImages(fundraiser.ID).Select(image => image.FundraiserImageURL).ToList();
+
             // Returning the fundraiser message object.
             return new FundraiserMessage
             {
@@ -270,10 +297,12 @@ namespace capstone_api.BusinessLogic
                 EndDate = fundraiser.EndDate,
                 CommentCount = commentCount,
                 DonationCount = donationCount,
+                ImageURLs = imageURLs,
                 Author = new UserMessage
                 {
                     FirstName = fundraiser.CreatedByUser.FirstName,
                     LastName = fundraiser.CreatedByUser.LastName,
+                    ProfilePictureURL = fundraiser.CreatedByUser.ProfilePictureURL,
                 },
             };
         }
@@ -391,6 +420,140 @@ namespace capstone_api.BusinessLogic
             }
 
             _fundraiserDataAccess.DonateToFundraiser(matchedFundraiser, message.Message, matchedUser, message.Amount);
+        }
+
+        /// <inheritdoc />
+        public async Task UploadImagesToFundraiser(Guid fundraiserID, IFormFile file)
+        {
+            Claim? userIDClaim = _httpContext.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "ID");
+
+            // If the user claim is not found, or otherwise it doesn't exist.
+            if (userIDClaim == null)
+            {
+                _logger.LogError($"Unable to find the user ID claim for request");
+
+                throw new HttpResponseException((int)HttpStatusCode.Unauthorized);
+            }
+
+            // Getting the ID of the user from the claim.
+            Guid userID = Guid.Parse(userIDClaim.Value);
+
+            // Getting the user by ID.
+            User? matchedUser = _authBusinessLogic.GetUserByID(userID);
+
+            // If the user doesn't exist.
+            if (matchedUser == null)
+            {
+                _logger.LogError($"Authenticated user with claim doesn't exist in database, user ID is [{userID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.Forbidden);
+            }
+
+            // Getting the fundraiser by ID if exists.
+            Fundraiser? matchedFundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
+
+            // If the fundraiser doesn't exist.
+            if (matchedFundraiser == null)
+            {
+                _logger.LogError($"Authenticated user is attempting to upload images for a fundraiser that doesn't exist, user ID is [{userID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.Forbidden);
+            }
+
+            // Setting up memory stream.
+            await using MemoryStream memoryStream = new MemoryStream();
+
+            // Copying image data to memory.
+            await file.CopyToAsync(memoryStream);
+
+            // Grabbing S3 bucket name from configuration.
+            string bucketName = _config["AWS:FundraiserImagesBucketName"];
+
+            // Authenticating the API to write to bucket.
+            BasicAWSCredentials awsCreds = new BasicAWSCredentials(_config["AWS:AccessKey"], _config["AWS:SecretKey"]);
+
+            // Setting up the S3 client.
+            IAmazonS3 client = new AmazonS3Client(awsCreds, Amazon.RegionEndpoint.USWest2);
+
+            TransferUtility transferUtility = new TransferUtility(client);
+
+            string imageName = $"FundraiserImage-{matchedUser.EmailAddress}-{Guid.NewGuid()}.png";
+
+            // Setting up the transfer utility request.
+            TransferUtilityUploadRequest request = new TransferUtilityUploadRequest()
+            {
+                BucketName = bucketName,
+                Key = imageName,
+                InputStream = memoryStream,
+                CannedACL = S3CannedACL.PublicRead, // This is critical for users viewing images.
+            };
+
+            try
+            {
+                // Uploading to S3.
+                await transferUtility.UploadAsync(request);
+
+                // Getting the pre-defined fundraiser picture URL.
+                string fundraiserPictureURL = $"https://{bucketName}.s3.amazonaws.com/{imageName}";
+
+                // Saving image references to our DB.
+                _fundraiserDataAccess.SaveFundraiserImageURL(fundraiserID, fundraiserPictureURL);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+
+                throw new HttpResponseException((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        public void RemoveFundraiserImages(Guid fundraiserID)
+        {
+            Claim? userIDClaim = _httpContext.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "ID");
+
+            // If the user claim is not found, or otherwise it doesn't exist.
+            if (userIDClaim == null)
+            {
+                _logger.LogError($"Unable to find the user ID claim for request");
+
+                throw new HttpResponseException((int)HttpStatusCode.Unauthorized);
+            }
+
+            // Getting the ID of the user from the claim.
+            Guid userID = Guid.Parse(userIDClaim.Value);
+
+            // Getting the user by ID.
+            User? matchedUser = _authBusinessLogic.GetUserByID(userID);
+
+            // If the user doesn't exist.
+            if (matchedUser == null)
+            {
+                _logger.LogError($"Authenticated user with claim doesn't exist in database, user ID is [{userID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.Forbidden);
+            }
+
+            // Getting the fundraiser by ID if exists.
+            Fundraiser? matchedFundraiser = _fundraiserDataAccess.GetFundraiser(fundraiserID);
+
+            // If the fundraiser doesn't exist.
+            if (matchedFundraiser == null)
+            {
+                _logger.LogError($"Authenticated user is attempting to delete images for a fundraiser that doesn't exist, user ID is [{userID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.Forbidden);
+            }
+
+            // If the user requesting is not the owner of the fundraiser.
+            if (!matchedFundraiser.CreatedByUserID.Equals(userID))
+            {
+                _logger.LogError($"Authenticated user is attempting to delete images for a fundraiser they do not own, user ID is [{userID}]");
+
+                throw new HttpResponseException((int)HttpStatusCode.Forbidden);
+            }
+
+            _fundraiserDataAccess.RemoveFundraiserImages(fundraiserID);
         }
     }
 }

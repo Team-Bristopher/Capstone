@@ -1,24 +1,13 @@
-import { Box, Container, Icon, Popover, PopoverBody, PopoverContent, PopoverTrigger, Text } from "@chakra-ui/react";
+import { Box, Container, Icon, Image, Popover, PopoverBody, PopoverContent, PopoverTrigger, Text } from "@chakra-ui/react";
 import { FunctionComponent } from "react";
 import { BsFillEyeFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { FundraiserDonationBar } from "../fundraiser-donation-bar/fundraiser_donation_bar";
-
-export enum FundraiserType {
-   Medical = 0,
-   Education = 1,
-   Disaster_Relief = 2,
-   Environment = 3,
-   Animal_Welfare = 4,
-   Financial_Assistance = 5,
-   Religion = 6,
-   Community = 7,
-   Political = 8,
-}
+import { FundrasierCategory } from "../models/incoming/Fundraiser";
 
 export interface FundraiserProps {
    ID: string;
-   type: FundraiserType;
+   type: FundrasierCategory;
    title: string;
    description: string;
    views: number;
@@ -27,6 +16,7 @@ export interface FundraiserProps {
    modifiedOn: Date;
    createdByID: string;
    endDate: Date;
+   fundraiserThumbnailImage: string;
 }
 
 export const Fundraiser: FunctionComponent<FundraiserProps> = (props: FundraiserProps) => {
@@ -47,13 +37,22 @@ export const Fundraiser: FunctionComponent<FundraiserProps> = (props: Fundraiser
             }}
             onClick={() => { navigate(`fundraiser/${props.ID}`); }}
          >
-            <Box
-               margin="0"
-               padding="0"
-               backgroundColor="#D9D9D9"
-               minHeight="65%"
-               width="100%"
-            />
+            {(props.fundraiserThumbnailImage.length > 0) ? (
+               <Image
+                  minHeight="65%"
+                  width="100%"
+                  borderRadius="10px"
+                  src={props.fundraiserThumbnailImage}
+               />
+            ) : (
+               <Box
+                  margin="0"
+                  padding="0"
+                  backgroundColor="#D9D9D9"
+                  minHeight="65%"
+                  width="100%"
+               />
+            )}
             <Box
                margin="0"
                padding="0"

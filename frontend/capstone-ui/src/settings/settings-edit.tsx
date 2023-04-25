@@ -2,7 +2,9 @@ import { Avatar, Container, Text, useToast } from "@chakra-ui/react";
 import { FunctionComponent, useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { HiOutlinePencil } from "react-icons/hi";
-import { editUserData } from "../api/api-calls";
+import ImageUploading from "react-images-uploading";
+import { editUserData, sendProfilePicture } from "../api/api-calls";
+import { CropImagesPopup } from "../crop-images-popup/crop_images_popup";
 import { AuthContext } from "../globals/auth_context";
 import { INVALID_NAME_ERROR, NAME_REGEX, NAME_TOO_LONG_ERROR, NAME_TOO_SHORT_ERROR, REQUIRED_FIELD_ERROR } from "../globals/form_globals";
 import { Button } from "../input/button";
@@ -22,7 +24,9 @@ interface EditProfileForm {
 }
 
 export const SettingsEdit: FunctionComponent = () => {
+   const [imageToCrop, setImageToCrop] = useState<string | undefined>(undefined);
    const [isLoadingOpen, setIsLoadingOpen] = useState<boolean>(false);
+   const [previewImageURL, setPreviewImageURL] = useState<string | undefined>(undefined);
 
    const authContext = useContext(AuthContext);
    const toast = useToast();
@@ -53,6 +57,7 @@ export const SettingsEdit: FunctionComponent = () => {
          status: response.responseType,
          duration: 3000,
          isClosable: false,
+         position: "top"
       });
    }
 
@@ -68,6 +73,54 @@ export const SettingsEdit: FunctionComponent = () => {
       setIsLoadingOpen(true);
 
       sendUpdateProfileRequest();
+   }
+
+   const onImageCropEnd = (result: "fail" | "success" | "manually_cancelled", imageURL: string | undefined) => {
+      if (result === "manually_cancelled") {
+         setImageToCrop(undefined);
+
+         return;
+      }
+
+      if (result === "fail" || imageURL === undefined) {
+         toast({
+            title: "An unknown error has occured, please try again later.",
+            status: "error",
+            duration: 3000,
+            isClosable: false,
+            position: "top"
+         });
+
+         return;
+      }
+
+      // Load image to the avatar section.
+      setPreviewImageURL(imageURL);
+
+      // Submit image to backend.
+      setIsLoadingOpen(true);
+
+      fetch(imageURL)
+         .then(async resp => {
+            const blob = await resp.blob();
+            const file = new File([blob], "image.png");
+
+            const response = await sendProfilePicture(file);
+
+            toast({
+               title: response.message,
+               status: response.responseType,
+               duration: 3000,
+               isClosable: false,
+               position: "top"
+            });
+
+            if (response.responseType === "success") {
+               window.location.reload();
+            }
+         });
+
+      setImageToCrop(undefined);
    }
 
    return (
@@ -115,10 +168,69 @@ export const SettingsEdit: FunctionComponent = () => {
                   width="100%"
                   maxWidth="100%"
                >
-                  <Avatar
-                     name={authContext.loggedInUser?.firstName + " " + authContext.loggedInUser?.lastName}
-                     size="2xl"
-                  />
+                  <ImageUploading
+                     maxNumber={1}
+                     value={[]}
+                     onChange={(value) => {
+                        setImageToCrop(value.length > 0 ? value[0].dataURL : undefined);
+                     }}
+                  >
+                     {({
+                        isDragging,
+                        dragProps,
+                        onImageUpload
+                     }) => (
+                        <>
+                           {(previewImageURL === undefined) && (
+                              <Container
+                                 width="10em"
+                                 height="10em"
+                                 backgroundColor="#D9D9D9"
+                                 padding="0"
+                                 margin="0"
+                                 alignContent="center"
+                                 justifyContent="center"
+                                 display="flex"
+                                 flexDir="column"
+                                 borderRadius="10px"
+                                 cursor="pointer"
+                                 border={isDragging ? "3px dashed" : undefined}
+                                 borderColor="#EF233C"
+                                 onClick={onImageUpload}
+                                 {...dragProps}
+                                 textAlign="center"
+                              >
+                                 <Text
+                                    color="white"
+                                    fontSize="xl"
+                                    alignSelf="center"
+                                 >
+                                    Click here to upload image
+                                 </Text>
+                              </Container>
+                           )}
+                           {imageToCrop !== undefined && (
+                              <CropImagesPopup
+                                 image={imageToCrop}
+                                 onClose={onImageCropEnd}
+                                 cropShape="round"
+                                 cropAspectRatio={1}
+                                 cropSize={{
+                                    width: 400,
+                                    height: 400,
+                                 }}
+                              />
+                           )}
+                        </>
+                     )}
+                  </ImageUploading>
+                  {(previewImageURL !== undefined) && (
+                     <Avatar
+                        name={authContext.loggedInUser?.firstName + " " + authContext.loggedInUser?.lastName}
+                        src={previewImageURL}
+                        size="2xl"
+                     />
+                  )}
                   <Container
                      margin="0"
                      display="flex"

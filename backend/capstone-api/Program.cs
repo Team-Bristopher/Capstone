@@ -25,12 +25,12 @@ builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Registering data access.
 builder.Services.AddScoped<IAuthDataAccess, AuthDataAccess>();
-builder.Services.AddScoped<IUsersDataAccess, UsersDataAccess>();
+builder.Services.AddTransient<IUsersDataAccess, UsersDataAccess>();
 builder.Services.AddScoped<IFundraiserDataAccess, FundraiserDataAccess>();
 
 // Registering business logic.
 builder.Services.AddScoped<IAuthBusinessLogic, AuthBusinessLogic>();
-builder.Services.AddScoped<IUsersBusinessLogic, UsersBusinessLogic>();
+builder.Services.AddTransient<IUsersBusinessLogic, UsersBusinessLogic>();
 builder.Services.AddScoped<IFundraiserBusinessLogic, FundraiserBusinessLogic>();
 
 // Registering filters.
@@ -82,6 +82,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseCors();
+
+app.UseStaticFiles();
 
 app.Run();
 

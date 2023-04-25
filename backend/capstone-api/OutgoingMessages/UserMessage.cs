@@ -16,6 +16,11 @@ namespace capstone_api.OutgoingMessages
 		/// The last name of the user.
 		/// </summary>
 		public string LastName { get; set; }
+
+		/// <summary>
+		/// The URL of the user's profile picture.
+		/// </summary>
+		public string ProfilePictureURL { get; set; }
 	}
 }
 

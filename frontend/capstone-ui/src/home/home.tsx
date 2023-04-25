@@ -55,6 +55,7 @@ export const Home: FunctionComponent = () => {
               icon={AiOutlinePlus}
               style={{
                 width: "16%",
+                maxWidth: "15em",
               }}
               onClick={() => { navigate("fundraiser/create"); }}
             />
@@ -116,10 +117,15 @@ export const Home: FunctionComponent = () => {
               <option value='6'>Religion</option>
               <option value='7'>Community</option>
               <option value='8'>Political</option>
+              <option value='9'>Other</option>
             </Select>
           </Box>
         </Container>
-        <Fundraisers search={searchValue ?? ""} category={categorySearch ?? 0} refresh={filterRefresh ?? 0} />
+        <Fundraisers
+          search={searchValue === "" ? undefined : searchValue}
+          category={categorySearch === 0 ? undefined : categorySearch}
+          refresh={filterRefresh ?? 0}
+        />
       </Page>
     </>
   );

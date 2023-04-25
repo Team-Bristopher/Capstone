@@ -51,6 +51,11 @@ namespace capstone_api.Models.DatabaseEntities
         public string Password { get; set; } = string.Empty;
 
         /// <summary>
+        /// The S3 public link to the user's profile picture.
+        /// </summary>
+        public string ProfilePictureURL { get; set; } = string.Empty;
+
+        /// <summary>
         /// The donations this User has donated.
         /// </summary>
         [Required]

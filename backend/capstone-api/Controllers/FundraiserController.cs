@@ -55,12 +55,25 @@ namespace capstone_api.Controllers
 			return Ok(response);
 		}
 
+		[HttpPost("image-upload")]
+		[Authorize(Policy = "RegisteredUser")]
+		public async Task<IActionResult> UploadFundraiserImages(
+			[FromQuery] Guid fundraiserID,
+			[FromForm] IFormFile file)
+		{
+			await _fundraiserBusinessLogic.UploadImagesToFundraiser(fundraiserID, file);
+
+			return Ok();
+		}
+
 		[HttpGet]
 		[AllowAnonymous]
 		public IActionResult GetFundraisers(
-			[FromQuery] int page)
+			[FromQuery] int page,
+			[FromQuery] string? fundraiserTitle,
+			[FromQuery] int? category)
 		{
-			IEnumerable<FundraiserMessage> fundraisers = _fundraiserBusinessLogic.GetFundraisers(page);
+			IEnumerable<FundraiserMessage> fundraisers = _fundraiserBusinessLogic.GetFundraisers(page, fundraiserTitle, category);
 
 			return Ok(fundraisers);
 		}
@@ -114,6 +127,16 @@ namespace capstone_api.Controllers
 			[FromBody] EditFundraiserMessage message)
 		{
 			_fundraiserBusinessLogic.EditFundraiser(fundraiserID, message);
+
+			return Ok();
+		}
+
+		[HttpDelete("remove-images")]
+        [Authorize(Policy = "RegisteredUser")]
+		public IActionResult RemoveFundraiserImages(
+			[FromQuery] Guid fundraiserID)
+		{
+			_fundraiserBusinessLogic.RemoveFundraiserImages(fundraiserID);
 
 			return Ok();
 		}

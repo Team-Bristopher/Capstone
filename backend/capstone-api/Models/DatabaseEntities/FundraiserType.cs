@@ -18,6 +18,7 @@ public enum FundraiserTypes
 	Religion = 6,
 	Community = 7,
 	Political = 8,
+	Other = 9,
 }
 
 namespace capstone_api.Models.DatabaseEntities

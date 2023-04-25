@@ -39,6 +39,11 @@ namespace capstone_api.OutgoingMessages
 		public double Target { get; set; }
 
 		/// <summary>
+		/// The URLs of the images related to this fundraiser.
+		/// </summary>
+		public List<string> ImageURLs { get; set; } = new List<string>();
+
+		/// <summary>
 		/// The author of this fundraiser.
 		/// </summary>
 		public UserMessage Author { get; set; }

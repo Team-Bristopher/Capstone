@@ -4,5 +4,11 @@
   "preset": "ts-jest",
   "testEnvironment": "jsdom",
   "collectCoverage": true,
-  "coverageReporters": ["json", "html"]
+  "coverageReporters": [
+    "json",
+    "html"
+  ],
+  "testMatch": [
+    "**/*.test.tsx"
+  ]
 }

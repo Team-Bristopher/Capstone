@@ -8,16 +8,14 @@ import { Fundraiser } from "../models/incoming/Fundraiser";
 
 // These props describe filtering options.
 interface FundraisersProps {
-   search: string;
-   category: number;
+   search: string | undefined;
+   category: number | undefined;
    refresh: number;
 }
 
 export const Fundraisers: FunctionComponent<FundraisersProps> = (props: FundraisersProps) => {
    const fetchFundraisers = useCallback(async ({ pageParam = 0 }) => {
-      const fundraisers = await getFundraisers(pageParam);
-
-
+      const fundraisers = await getFundraisers(pageParam, props.search, props.category);
 
       return fundraisers;
 
@@ -25,7 +23,7 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
    }, [props]);
 
    const { data, isFetching, fetchNextPage, hasNextPage, refetch } = useInfiniteQuery<Fundraiser[]>({
-      queryKey: ["fundraisers"],
+      queryKey: ["fundraisers", props.category],
       queryFn: fetchFundraisers,
       refetchOnWindowFocus: false,
       getNextPageParam: (lastPage, pages) => {
@@ -55,8 +53,10 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
             spacing={50}
             padding="0"
             margin="0"
+            maxHeight="none"
+            maxWidth="none"
+            marginBottom="1em"
          >
-
             <Skeleton
                width="25em"
                height="30em"
@@ -102,6 +102,7 @@ export const Fundraisers: FunctionComponent<FundraisersProps> = (props: Fundrais
                            createdOn={fundraiser.createdOn}
                            modifiedOn={fundraiser.modifiedOn}
                            endDate={fundraiser.endDate}
+                           fundraiserThumbnailImage={fundraiser.imageURLs.length > 0 ? fundraiser.imageURLs[0] : ""}
                         />
                      </>
                   )))}

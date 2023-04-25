@@ -84,6 +84,7 @@ export const AllCommentsPopup: FunctionComponent<AllCommentsPopupProps> = (props
                <AlertDialogContent
                   maxWidth="100vw"
                   width="50vw"
+                  minHeight="80vh"
                >
                   <AlertDialogHeader
                      backgroundColor="#2B2D42"

@@ -47,6 +47,7 @@ export const Login: FunctionComponent = () => {
          status: response.responseType,
          duration: 3000,
          isClosable: false,
+         position: "top"
       });
 
       if (response.responseType === "success") {
@@ -146,7 +147,7 @@ export const Login: FunctionComponent = () => {
                               message: EMAIL_TOO_SHORT_ERROR,
                            },
                            maxLength: {
-                              value: 25,
+                              value: 75,
                               message: EMAIL_TOO_LONG_ERROR,
                            },
                         },

@@ -52,6 +52,16 @@ namespace capstone_api
         public DbSet<FundraiserView> FundraiserViews { get; set; }
 
         /// <summary>
+        /// The FundraiserImages database context.
+        /// </summary>
+        public DbSet<FundraiserImages> FundraiserImages { get; set; }
+
+        /// <summary>
+        /// The RecoveryCodes database context.
+        /// </summary>
+        public DbSet<RecoveryCodes> RecoveryCodes { get; set; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
@@ -95,6 +105,14 @@ namespace capstone_api
 
                 entity.HasMany(e => e.Donations).WithOne(e => e.Fundraiser);
                 entity.HasMany(e => e.Admins).WithOne(e => e.Fundraiser);
+                entity.HasMany(e => e.FundraiserImages).WithOne(e => e.Fundraiser);
+            });
+
+            modelBuilder.Entity<FundraiserImages>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+
+                entity.HasOne(e => e.Fundraiser).WithMany(e => e.FundraiserImages);
             });
 
             modelBuilder.Entity<FundraiserAdmin>(entity =>
@@ -125,6 +143,13 @@ namespace capstone_api
 
                 entity.HasMany(e => e.Donations).WithOne(e => e.DonatedBy);
                 entity.HasMany(e => e.CreatedFundraisers).WithOne(e => e.CreatedByUser);
+            });
+
+            modelBuilder.Entity<RecoveryCodes>(entity =>
+            {
+                entity.HasKey(e => e.ID);
+
+                entity.HasOne(e => e.RequestedForUser);
             });
 
             modelBuilder.Entity<FundraiserView>(entity =>
@@ -195,6 +220,11 @@ namespace capstone_api
                 {
                     ID = Guid.Parse("64d3f6df-5597-4856-9627-e72aadd323e9"),
                     Type = FundraiserTypes.Political,
+                },
+                new FundraiserType()
+                {
+                    ID = Guid.Parse("a577a3a2-2048-4010-9f21-23410e5e0065"),
+                    Type = FundraiserTypes.Other,
                 },
             });
         }

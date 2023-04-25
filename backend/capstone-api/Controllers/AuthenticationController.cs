@@ -2,6 +2,7 @@
 using capstone_api.BusinessLogic;
 using capstone_api.IncomingMessages;
 using capstone_api.Models.OutgoingMessages;
+using capstone_api.OutgoingMessages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -75,6 +76,40 @@ namespace capstone_api.Controllers
 			MyUserMessage message = _authBusinessLogic.GetMyUser();
 
 			return Ok(message);
+		}
+
+		[HttpPost("recovery")]
+		[AllowAnonymous]
+		public IActionResult SendRecoveryEmail(
+			[FromQuery] string emailAddress
+		)
+		{
+			_authBusinessLogic.SendAccountRecoveryEmail(emailAddress);
+
+			return Ok();
+        }
+
+		[HttpPost("recovery-confirm")]
+		[AllowAnonymous]
+		public IActionResult ConfirmRecoveryCode(
+			[FromQuery] string recoveryCode,
+			[FromQuery] string emailAddress)
+		{
+			RecoveryCodeResponse recoveryCodeResponse = _authBusinessLogic.VerifyRecoveryCode(emailAddress, recoveryCode);
+
+			return Ok(recoveryCodeResponse);
+		}
+
+		[HttpPost("password-reset")]
+		[AllowAnonymous]
+		public IActionResult ResetPassword(
+            [FromQuery] string authCode,
+            [FromQuery] string emailAddress,
+			[FromBody] ResetPasswordMessage resetPasswordMessage)
+		{
+			_authBusinessLogic.ResetPassword(resetPasswordMessage, emailAddress, authCode);
+
+			return Ok();
 		}
 	}
 }
