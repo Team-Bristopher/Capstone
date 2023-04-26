@@ -1,5 +1,5 @@
-import { Box, Icon, Input, Popover, PopoverBody, PopoverContent, PopoverTrigger, StyleProps, Text } from "@chakra-ui/react";
-import React, { FunctionComponent } from "react";
+import { Box, Icon, Input, Popover, PopoverBody, PopoverContent, PopoverTrigger, StyleProps, Text, Textarea } from "@chakra-ui/react";
+import { ChangeEvent, FunctionComponent } from "react";
 import { RegisterOptions, UseFormRegister } from "react-hook-form";
 import { BiError } from "react-icons/bi";
 import { IconType } from "react-icons/lib";
@@ -27,9 +27,15 @@ interface TextInputProps {
 }
 
 export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputProps) => {
-   const onInputChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+   const onTextAreaInputChanged = (e: ChangeEvent<HTMLTextAreaElement>) => {
       if (props.onChange) {
          props.onChange(e.target.value);
+      }
+   }
+
+   const onInputChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (props.onChange) {
+         props.onChange(event.target.value);
       }
    }
 
@@ -51,7 +57,6 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                marginBottom="1em"
                display="flex"
                flexDir="column"
-               alignItems="center"
                aria-label={props.ariaLabel}
                {...props.containerStyle}
             >
@@ -84,7 +89,7 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                      </Popover>
                   }
                </Text>
-               <Input
+               <Textarea
                   backgroundColor="white"
                   aria-label={props.ariaLabel}
                   _focusWithin={{
@@ -93,8 +98,7 @@ export const TextInput: FunctionComponent<TextInputProps> = (props: TextInputPro
                   _focusVisible={{
                      "border": "2px solid #2B2D42",
                   }}
-                  onChange={onInputChanged}
-                  type={props.hideText ? "password" : undefined}
+                  onChange={(e) => { onTextAreaInputChanged(e); }}
                   {...props.formInfo?.registerFn(props.formInfo?.name || '', props.formInfo?.registerOptions)}
                   {...props.style}
                   placeholder={props.placeholder}

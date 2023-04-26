@@ -1,8 +1,7 @@
-import { Box, Checkbox, Container, Icon, Popover, PopoverBody, PopoverContent, PopoverTrigger, Text, useToast } from "@chakra-ui/react";
+import { Container, Text, useToast } from "@chakra-ui/react";
 import { FunctionComponent, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiCreditCardFront } from "react-icons/bi";
-import { BsInfoCircle } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { donateToFundraiser } from "../api/api-calls";
 import { AuthContext } from "../globals/auth_context";
@@ -75,6 +74,7 @@ export const DonationPayment: FunctionComponent = () => {
          status: response.responseType,
          duration: 3000,
          isClosable: false,
+         position: "top"
       });
    }
 
@@ -257,59 +257,6 @@ export const DonationPayment: FunctionComponent = () => {
                      }}
                   />
                </Container>
-               {authContext.loggedInUser !== undefined && (
-                  <Container
-                     textAlign="center"
-                     display="flex"
-                     flexDir="row"
-                     width="100%"
-                     marginBottom="0"
-                     maxWidth="100%"
-                     marginTop="1em"
-                     justifyContent="center"
-                  >
-                     <Box
-                        padding="0"
-                        margin="0"
-                        width="50em"
-                        display="flex"
-                        flexDir="row"
-                        justifyContent="start"
-                        alignContent="center"
-                     >
-                        <Checkbox
-                           size="lg"
-                           colorScheme="red"
-                           {...register(PaymentPageFormNames.saveInformation)}
-                        >
-                           <Text
-                              color="#2B2D42"
-                              fontWeight="bold"
-                           >
-                              Save payment information
-                           </Text>
-                        </Checkbox>
-                        <Popover placement="top" trigger="hover">
-                           <PopoverTrigger>
-                              <div>
-                                 <Icon
-                                    as={BsInfoCircle}
-                                    boxSize="6"
-                                    color="#2B2D42"
-                                    marginLeft="0.5em"
-                                 />
-                              </div>
-                           </PopoverTrigger>
-                           <PopoverContent>
-                              <PopoverBody textAlign="center">
-                                 By checking “Save Payment Information”, your payment information will be stored on this site.
-                                 Future payments will automatically use this (you can edit this in Settings {"->"} Payment Information).
-                              </PopoverBody>
-                           </PopoverContent>
-                        </Popover>
-                     </Box>
-                  </Container>
-               )}
                <Container
                   textAlign="center"
                   display="flex"

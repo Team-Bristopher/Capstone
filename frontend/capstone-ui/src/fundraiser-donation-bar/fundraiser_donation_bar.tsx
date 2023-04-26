@@ -2,7 +2,7 @@ import { Box, Container, Progress, Text } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { FunctionComponent } from "react";
 import { getFundraiserAmount } from "../api/api-calls";
-import { formatCurrencyToString, getFormattedDateString } from "../globals/helpers";
+import { formatCurrencyToString } from "../globals/helpers";
 import { FundraiserDonationAmountMessage } from "../models/incoming/FundraiserDonationAmountMessage";
 import { DonationTimeSort } from "../recent-donations/recent_donations";
 
@@ -105,16 +105,29 @@ export const FundraiserDonationBar: FunctionComponent<FundraiserDonationBarProps
                   flexDir="row"
                   width="35%"
                >
-                  <Text
-                     color="#2B2D42"
-                     fontSize="1em"
-                     fontWeight="bold"
-                     marginRight="0.3em"
-                     marginTop="0.5em"
-                     marginLeft="auto"
-                  >
-                     Ends {getFormattedDateString(new Date(props.endDate))}
-                  </Text>
+                  {(new Date(props.endDate) < new Date()) ? (
+                     <Text
+                        color="#EF233C"
+                        fontSize="1em"
+                        fontWeight="bold"
+                        marginRight="0.3em"
+                        marginTop="0.5em"
+                        marginLeft="auto"
+                     >
+                        Expired
+                     </Text>
+                  ) : (
+                     <Text
+                        color="#2B2D42"
+                        fontSize="1em"
+                        fontWeight="bold"
+                        marginRight="0.3em"
+                        marginTop="0.5em"
+                        marginLeft="auto"
+                     >
+                        Ends {(new Date(props.endDate).toLocaleDateString())}
+                     </Text>
+                  )}
                </Box>
             </Container>
          </Container>

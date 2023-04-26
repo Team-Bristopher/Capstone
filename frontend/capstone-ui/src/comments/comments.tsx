@@ -78,7 +78,6 @@ export const Comments: FunctionComponent = () => {
                   marginBottom="1em"
                >
                   {(commentPage.map((comment) => (
-
                      <Container
                         maxW="100%"
                         w="100%"

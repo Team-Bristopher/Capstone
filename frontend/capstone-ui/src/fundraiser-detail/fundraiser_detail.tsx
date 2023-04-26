@@ -1,15 +1,16 @@
-import { Box, Container, Divider, HStack, Icon, Progress, Skeleton, Text, useToast } from "@chakra-ui/react";
+import { Avatar, Box, Container, Divider, HStack, Icon, Progress, Skeleton, Text, useToast } from "@chakra-ui/react";
 import { createContext, FunctionComponent, useContext, useEffect, useRef, useState } from "react";
 import { AiOutlineFrown } from "react-icons/ai";
 import { BsFillEyeFill, BsFillPersonFill } from "react-icons/bs";
 import { MdInsertComment } from "react-icons/md";
 import { RiPencilFill } from "react-icons/ri";
+import ImageGallery from "react-image-gallery";
 import { useNavigate, useParams } from "react-router-dom";
 import { getFundraiserAmount, getFundraiserDetail, viewFundraiser } from "../api/api-calls";
 import { Comments } from "../comments/comments";
 import { DonationPopup } from "../donation-popup/donation_popup";
 import { AuthContext } from "../globals/auth_context";
-import { formatCurrencyToString, getFormattedDateString } from "../globals/helpers";
+import { formatCurrencyToString, getCategoryIcon, getFormattedDateString } from "../globals/helpers";
 import { Button } from "../input/button";
 import { Fundraiser } from "../models/incoming/Fundraiser";
 import { FundraiserDonationMessage } from "../models/incoming/FundraiserDonationMessage";
@@ -53,6 +54,7 @@ export const FundraiserDetail: FunctionComponent = () => {
             status: "error",
             duration: 3000,
             isClosable: false,
+            position: "top"
          });
 
          return;
@@ -75,6 +77,7 @@ export const FundraiserDetail: FunctionComponent = () => {
             status: "error",
             duration: 3000,
             isClosable: false,
+            position: "top"
          });
 
          return;
@@ -255,14 +258,33 @@ export const FundraiserDetail: FunctionComponent = () => {
                         margin="0"
                         width="100%"
                         maxWidth="100%"
+                        minHeight="40em"
+                        maxHeight="40em"
                         marginTop="1.2em"
+                        flexWrap="wrap"
+                        justifyContent="center"
                      >
-                        <Box
-                           width="100%"
-                           maxWidth="100%"
-                           height="40em"
-                           backgroundColor="#D9D9D9"
-                        />
+                        {fundraiserDetail.imageURLs.length > 0 ? (
+                           <ImageGallery
+                              items={fundraiserDetail.imageURLs.map((val) => {
+                                 return {
+                                    original: val,
+                                    thumbnail: val,
+                                    originalWidth: 600,
+                                    originalHeight: 400,
+                                 }
+                              })}
+                              autoPlay={true}
+                              showIndex={true}
+                           />
+                        ) : (
+                           <Box
+                              width="100%"
+                              maxWidth="100%"
+                              height="40em"
+                              backgroundColor="#D9D9D9"
+                           />
+                        )}
                      </Container>
                      <Container
                         display="flex"
@@ -273,29 +295,51 @@ export const FundraiserDetail: FunctionComponent = () => {
                         maxWidth="100%"
                         marginTop="1.2em"
                         justifyContent="space-between"
+                        alignContent="center"
                      >
                         <Box
                            margin="0"
                            padding="0"
                            width="50%"
+                           maxW="50%"
                            display="flex"
                            flexDir="row"
+                           justifyContent="space-between"
                         >
-                           <Icon
-                              as={BsFillPersonFill}
-                              boxSize={8}
-                              color="#2B2D42"
-                              marginRight="0.5em"
-                           />
+                           {(fundraiserDetail.author.profilePictureURL !== "") ? (
+                              <Avatar
+                                 size="sm"
+                                 src={fundraiserDetail.author.profilePictureURL}
+                              />
+                           ) : (
+                              <Icon
+                                 as={BsFillPersonFill}
+                                 boxSize={8}
+                                 color="#2B2D42"
+                                 marginRight="0.5em"
+                              />
+                           )}
                            <Text
                               width="100%"
                               height="auto"
                               fontSize="1.2rem"
                               fontWeight="bold"
+                              marginLeft="0.5em"
                            >
                               {fundraiserDetail?.author.firstName} {fundraiserDetail?.author.lastName}
                            </Text>
                         </Box>
+                        {(new Date(fundraiserDetail.createdOn) < new Date(fundraiserDetail.modifiedOn)) && (
+                           <Text
+                              width="auto"
+                              height="auto"
+                              fontSize="1rem"
+                              fontWeight="bold"
+                              marginLeft="auto"
+                           >
+                              Fundraiser last modified {getFormattedDateString(new Date(fundraiserDetail?.modifiedOn))}
+                           </Text>
+                        )}
                      </Container>
                      <Divider
                         marginTop="0.5em"
@@ -394,31 +438,57 @@ export const FundraiserDetail: FunctionComponent = () => {
                      maxWidth="30%"
                      alignContent="start"
                      flexWrap="wrap"
+                     paddingTop="1em"
                   >
-                     {(authContext.loggedInUser !== undefined && authContext.loggedInUser.id === fundraiserDetail?.createdBy) && (
-                        <Container
-                           display="flex"
-                           flexDir="row"
-                           padding="0"
-                           margin="0"
-                           width="100%"
-                           maxWidth="100%"
-                           marginTop="1.2em"
-                        >
+                     <Container
+                        display="flex"
+                        flexDir="row"
+                        padding="0"
+                        margin="0"
+                        width="100%"
+                        maxWidth="100%"
+                        marginTop="0.5em"
+                        justifyContent="space-between"
+                        alignContent="baseline"
+                        flexWrap="wrap"
+                     >
+                        {(authContext.loggedInUser !== undefined && authContext.loggedInUser.id === fundraiserDetail?.createdBy) && (
                            <Button
                               label="Edit"
                               ariaLabel="Edit fundraiser button"
                               variant="icon_text"
                               icon={RiPencilFill}
                               style={{
-                                 "marginLeft": "auto",
                                  "width": "8em",
                                  "paddingLeft": "0.5em"
                               }}
                               onClick={() => { navigate(`/fundraiser/edit/${fundraiserDetail.id}`); }}
                            />
+                        )}
+                        <Container
+                           margin="0"
+                           padding="0"
+                           display="flex"
+                           flexDir="row"
+                           alignItems="center"
+                           flexWrap="wrap"
+                           height="100%"
+                           width="auto"
+                           marginLeft="auto"
+                        >
+                           <Icon
+                              as={getCategoryIcon(fundraiserContext.current?.fundraiser?.type ?? undefined)[1]}
+                              boxSize={7}
+                           />
+                           <Text
+                              fontSize="1em"
+                              fontWeight="bold"
+                              marginLeft="0.5em"
+                           >
+                              {getCategoryIcon(fundraiserContext.current?.fundraiser?.type ?? undefined)[0]}
+                           </Text>
                         </Container>
-                     )}
+                     </Container>
                      <Container
                         display="flex"
                         flexDir="row"
@@ -469,7 +539,7 @@ export const FundraiserDetail: FunctionComponent = () => {
                               marginTop="0.5em"
                               marginLeft="auto"
                            >
-                              Ends {getFormattedDateString(new Date(fundraiserDetail?.endDate))}
+                              Ends {(new Date(fundraiserDetail.endDate).toLocaleDateString())}
                            </Text>
                         </Box>
                      </Container>

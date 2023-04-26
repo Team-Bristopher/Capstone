@@ -7,7 +7,9 @@ import { ForgotPassword } from "./forgot-password/forgot_password";
 import { FundraiserDetail } from "./fundraiser-detail/fundraiser_detail";
 import { Home } from "./home/home";
 import { Login } from "./login/login";
+import { NewPassword } from "./new-password/new_password";
 import { NotFound } from "./notfound/notfound";
+import { Recovery } from "./recovery/recovery";
 import { RegisterPage } from "./register/register";
 import { Settings } from "./settings/settings";
 import { SettingsEdit } from "./settings/settings-edit";
@@ -33,6 +35,8 @@ export const App: FunctionComponent = () => {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="recovery" element={<Recovery />} />
+        <Route path="new-password" element={<NewPassword />} />
 
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
         <Route path="accessibility-statement" element={<AccessibilityStatement />} />

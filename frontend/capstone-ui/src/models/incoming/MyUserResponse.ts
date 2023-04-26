@@ -4,6 +4,7 @@ export interface MyUserResponseSuccess {
    lastName: string;
    email: string;
    role: string;
+   profilePictureURL: string;
 }
 
 export interface MyUserResponse {

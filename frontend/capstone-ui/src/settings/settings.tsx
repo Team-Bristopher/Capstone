@@ -55,6 +55,7 @@ export const Settings: FunctionComponent = () => {
           <Avatar
             name={authContext.loggedInUser?.firstName + " " + authContext.loggedInUser?.lastName}
             size="2xl"
+            src={authContext.loggedInUser?.profilePictureURL !== "" ? authContext.loggedInUser?.profilePictureURL : undefined}
           />
           <Container
             margin="0"

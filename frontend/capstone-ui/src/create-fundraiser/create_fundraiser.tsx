@@ -1,11 +1,15 @@
-import { Box, Container, Text, useToast } from "@chakra-ui/react";
+import { Box, Container, Icon, Text, useToast } from "@chakra-ui/react";
 import { FunctionComponent, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AiOutlinePlus } from "react-icons/ai";
 import { BiCalendar } from "react-icons/bi";
+import { BsImage } from "react-icons/bs";
 import { MdOutlineAttachMoney } from "react-icons/md";
+import ImageUploading from "react-images-uploading";
 import { useNavigate } from "react-router-dom";
-import { createFundraiser } from "../api/api-calls";
+import { createFundraiser, sendFundraiserImage } from "../api/api-calls";
+import { CreateFundraiserImagePreview } from "../create-fundraiser-image-preview/create_fundraiser_image_preview";
+import { CropImagesPopup } from "../crop-images-popup/crop_images_popup";
 import { AuthContext } from "../globals/auth_context";
 import { FUNDRAISER_DESCRIPTION_REGEX, FUNDRAISER_DESCRIPTION_TOO_LONG_ERROR, FUNDRAISER_DESCRIPTION_TOO_SHORT_ERROR, FUNDRAISER_TITLE_REGEX, FUNDRAISER_TITLE_TOO_LONG_ERROR, FUNDRAISER_TITLE_TOO_SHORT_ERROR, GOAL_TOO_SMALL_ERROR, INVALID_FUNDRAISER_DESCRIPTION_ERROR, INVALID_FUNDRAISER_TITLE_ERROR, REQUIRED_FIELD_ERROR } from "../globals/form_globals";
 import { Button } from "../input/button";
@@ -36,6 +40,8 @@ interface CreateFundraiserForm {
 export const CreateFundraiser: FunctionComponent = () => {
    const [isLoadingOpen, setIsLoadingOpen] = useState<boolean>(false);
    const [categoryDropdownValue, setCategoryDropdownValue] = useState<string>("0");
+   const [imageToCrop, setImageToCrop] = useState<string | undefined>(undefined);
+   const [imagesToUpload, setImagesToUpload] = useState<Array<string>>([]);
 
    const navigate = useNavigate();
    const toast = useToast();
@@ -65,12 +71,45 @@ export const CreateFundraiser: FunctionComponent = () => {
          status: response.responseType,
          duration: 3000,
          isClosable: false,
+         position: "top"
       });
 
       // Redirect to fundraiser detail.
       if (response.responseType === "success") {
+         for (let i = 0; i < imagesToUpload.length; i++) {
+            const formData = new FormData();
+
+            await fetch(imagesToUpload[i])
+               .then(async (resp) => {
+                  const blob = await resp.blob();
+                  const file = new File([blob], "image.png");
+
+                  formData.append("file", file);
+               });
+
+            const imagesResponse = await sendFundraiserImage(response.fundraiserID, formData);
+
+            if (imagesResponse.responseType === "error") {
+               toast({
+                  title: imagesResponse.message,
+                  status: imagesResponse.responseType,
+                  duration: 3000,
+                  isClosable: false,
+                  position: "top"
+               });
+
+               setIsLoadingOpen(false);
+
+               return;
+            }
+         }
+
+         setIsLoadingOpen(false);
+
          navigate(`/fundraiser/${response.fundraiserID}`);
       }
+
+      setIsLoadingOpen(false);
    }
 
    const onSubmit = () => {
@@ -87,6 +126,32 @@ export const CreateFundraiser: FunctionComponent = () => {
             </Page>
          </>
       )
+   }
+
+   const onImageCropEnd = (result: "fail" | "success" | "manually_cancelled", imageURL: string | undefined) => {
+      if (result === "manually_cancelled") {
+         setImageToCrop(undefined);
+
+         return;
+      }
+
+      if (result === "fail" || imageURL === undefined) {
+         toast({
+            title: "An unknown error has occured, please try again later.",
+            status: "error",
+            duration: 3000,
+            isClosable: false,
+            position: "top"
+         });
+
+         return;
+      }
+
+      if (result === "success") {
+         setImageToCrop(undefined);
+
+         setImagesToUpload([...imagesToUpload, imageURL]);
+      }
    }
 
    return (
@@ -118,7 +183,7 @@ export const CreateFundraiser: FunctionComponent = () => {
                      label="Create"
                      variant="icon_text"
                      icon={AiOutlinePlus}
-                     ariaLabel="Edit profile button"
+                     ariaLabel="Create fundraiser button"
                      style={{
                         padding: "1em"
                      }}
@@ -176,13 +241,91 @@ export const CreateFundraiser: FunctionComponent = () => {
                            }}
                         />
                      </Box>
-                     <Box
-                        padding="0"
-                        margin="0"
-                        maxWidth="100%"
-                        width="100%"
-                        backgroundColor="#D9D9D9"
-                        height="30em"
+                     <ImageUploading
+                        maxNumber={5}
+                        value={[]}
+                        onChange={(value) => {
+                           setImageToCrop(value.length > 0 ? value[0].dataURL : undefined);
+                        }}
+                     >
+                        {({
+                           isDragging,
+                           dragProps,
+                           onImageUpload
+                        }) => (
+                           <>
+                              <Box
+                                 padding="0"
+                                 margin="0"
+                                 maxWidth="100%"
+                                 width="100%"
+                                 backgroundColor="#D9D9D9"
+                                 height="30em"
+                                 borderRadius="10px"
+                                 _hover={{
+                                    cursor: "pointer",
+                                 }}
+                                 border={isDragging ? "3px dashed" : undefined}
+                                 onClick={() => {
+                                    if (imagesToUpload.length < 5) {
+                                       onImageUpload();
+                                    } else {
+                                       toast({
+                                          title: "You are not allowed to upload any more images.",
+                                          status: "error",
+                                          duration: 3000,
+                                          isClosable: false,
+                                          position: "top"
+                                       })
+                                    }
+                                 }}
+                                 display="flex"
+                                 flexDir="column"
+                                 justifyContent="center"
+                                 alignContent="center"
+                                 flexWrap="wrap"
+                                 {...dragProps}
+                              >
+                                 <Text
+                                    color="white"
+                                    fontSize="2xl"
+                                    alignSelf="center"
+                                 >
+                                    Click here to upload images
+                                 </Text>
+                                 <Icon
+                                    as={BsImage}
+                                    color="white"
+                                    boxSize="7em"
+                                    alignSelf="center"
+                                 />
+                                 <Text
+                                    color="white"
+                                    fontSize="2xl"
+                                 >
+                                    {imagesToUpload.length} / 5 images have been uploaded
+                                 </Text>
+                              </Box>
+                              {imageToCrop !== undefined && (
+                                 <CropImagesPopup
+                                    image={imageToCrop}
+                                    onClose={onImageCropEnd}
+                                    cropShape="rect"
+                                    cropAspectRatio={1 / 2}
+                                    cropSize={{
+                                       width: 800,
+                                       height: 600,
+                                    }}
+                                 />
+                              )}
+                           </>
+                        )}
+                     </ImageUploading>
+                     <CreateFundraiserImagePreview
+                        imageURLs={imagesToUpload}
+                        onImageRemoved={(url: string) => {
+                           setImagesToUpload([...imagesToUpload.filter(_url => _url !== url)])
+                        }}
                      />
                      <TextInput
                         variant="text_only"
@@ -306,6 +449,10 @@ export const CreateFundraiser: FunctionComponent = () => {
                            {
                               value: "8",
                               name: "Political",
+                           },
+                           {
+                              value: "9",
+                              name: "Other",
                            },
                         ]}
                      />

@@ -79,6 +79,12 @@ namespace capstone_api.Models.DatabaseEntities
         public User? CreatedByUser { get; set; }
 
         /// <summary>
+        /// The FundraiserImages tied to this Fundraiser.
+        /// </summary>
+        [Required]
+        public List<FundraiserImages> FundraiserImages { get; set; } = new List<FundraiserImages>();
+
+        /// <summary>
         /// The Donatins tied to this Fundraiser.
         /// </summary>
         [Required]

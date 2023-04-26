@@ -68,6 +68,7 @@ export const DateInput: FunctionComponent<DateInputProps> = (props: DateInputPro
                   maxWidth="100%"
                   backgroundColor="white"
                   type="date"
+                  min={(new Date()).toISOString().substring(0, 10)}
                   _focusWithin={{
                      "border": "2px solid #2B2D42",
                   }}

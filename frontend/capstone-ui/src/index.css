@@ -11,3 +11,24 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+@import "~react-image-gallery/styles/css/image-gallery.css";
+
+.image-gallery {
+  width: 50em;
+  height: auto;
+  max-height: 40em;
+}
+
+.image-gallery-slide img {
+  width: 100%;
+  height: auto;
+  max-height: 40em;
+  object-fit: cover;
+  overflow: hidden;
+  object-position: center center;
+}
+
+.fullscreen .image-gallery-slide img {
+  max-height: 100vh;
+}

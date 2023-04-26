@@ -36,6 +36,11 @@ namespace capstone_api.Models.OutgoingMessages
 		public string Email { get; set; }
 
 		/// <summary>
+		/// The profile picture URL.
+		/// </summary>
+		public string ProfilePictureURL { get; set; }
+
+		/// <summary>
 		/// The role of the user.
 		/// </summary>
 		[Required]

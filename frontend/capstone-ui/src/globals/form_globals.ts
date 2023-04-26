@@ -93,4 +93,9 @@ export const SECURITY_CODE_REQUIRED_ERROR: string = "Security code is required."
 
 export const SECURITY_CODE_INVALID_ERROR: string = "Security code is invalid.";
 
+// Account recovery.
+export const ACCOUNT_RECOVERY_CODE_REGEX: RegExp = /^\d{6}$/;
+
+export const INVALID_RECOVERY_CODE_ERROR: string = "Invalid recovery code.";
+
 

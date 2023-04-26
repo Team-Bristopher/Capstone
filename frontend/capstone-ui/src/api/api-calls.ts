@@ -6,9 +6,14 @@ import { Fundraiser } from "../models/incoming/Fundraiser";
 import { FundraiserDonationAmountMessage } from "../models/incoming/FundraiserDonationAmountMessage";
 import { FundraiserDonationMessage } from "../models/incoming/FundraiserDonationMessage";
 import { HealthcheckMessage } from "../models/incoming/HealthcheckResponse";
+import { ImageUploadResponseMessage } from "../models/incoming/ImageUploadResponseMessage";
 import { LoggedInUserResponse } from "../models/incoming/LoggedInUserResponse";
 import { MyUserResponse } from "../models/incoming/MyUserResponse";
+import { RecoveryResponse } from "../models/incoming/RecoveryResponse";
+import { RecoveryResponseMessage } from "../models/incoming/RecoveryResponseMessage";
 import { RegisterUserResponse } from "../models/incoming/RegisterUserResponse";
+import { RemoveFundraiserImagesResponse } from "../models/incoming/RemoveFundraiserImagesResponse";
+import { ResetPasswordResponse } from "../models/incoming/ResetPasswordResponse";
 import { CreateFundraiserMessage } from "../models/outgoing/CreateFundraiserMessage";
 import { DonateToFundraiserMessage } from "../models/outgoing/DonateToFundraiserMessage";
 import { EditFundraiserMessage } from "../models/outgoing/EditFundraiserMessage";
@@ -210,8 +215,18 @@ export const createFundraiser = (createFundraserMessage: CreateFundraiserMessage
     })
 }
 
-export const getFundraisers = (page: number): Promise<Array<Fundraiser>> => {
-  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser?page=${page}`)
+export const getFundraisers = (page: number, fundraiserTitle: string | undefined, fundraiserCategory: number | undefined): Promise<Array<Fundraiser>> => {
+  let queryParams: string = `page=${page}`;
+
+  if (fundraiserTitle !== undefined) {
+    queryParams += `&fundraiserTitle=${fundraiserTitle}`;
+  }
+
+  if (fundraiserCategory !== undefined && !isNaN(fundraiserCategory)) {
+    queryParams += `&category=${fundraiserCategory}`;
+  }
+
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser?${queryParams}`)
     .then(async (resp) => {
       switch (resp.status) {
         case 200:
@@ -311,4 +326,148 @@ export const editFundraiser = (fundraiserID: string, message: EditFundraiserMess
           } as EditFundraiserResponse
       }
     })
+}
+
+export const sendProfilePicture = (imageFile: File): Promise<ImageUploadResponseMessage> => {
+  const authorization = localStorage.getItem("accessToken");
+  const formData = new FormData();
+
+  formData.append("file", imageFile);
+
+  return fetch(`${process.env.REACT_APP_API_URL}/api/user/image-upload`, {
+    headers: {
+      "Authorization": "Bearer " + (authorization || ""),
+    },
+    method: "POST",
+    body: formData,
+  }).then((resp) => {
+    switch (resp.status) {
+      case 200:
+        return {
+          message: "Image(s) successfully uploaded.",
+          responseType: "success",
+        } as ImageUploadResponseMessage
+      default:
+        return {
+          message: "An unknown error has occured while uploading image(s).",
+          responseType: "error",
+        } as ImageUploadResponseMessage
+    }
+  });
+}
+
+export const sendFundraiserImage = (fundraiserID: string, formData: FormData): Promise<ImageUploadResponseMessage> => {
+  const authorization = localStorage.getItem("accessToken");
+
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/image-upload?fundraiserID=${fundraiserID}`, {
+    headers: {
+      "Authorization": "Bearer " + (authorization || ""),
+    },
+    method: "POST",
+    body: formData,
+  }).then((resp) => {
+    switch (resp.status) {
+      case 200:
+        return {
+          message: "Image(s) successfully uploaded.",
+          responseType: "success",
+        } as ImageUploadResponseMessage
+      default:
+        return {
+          message: "An unknown error has occured while uploading image(s).",
+          responseType: "error",
+        } as ImageUploadResponseMessage
+    }
+  });
+}
+
+export const sendRecoverAccountRequest = (emailAddress: string): Promise<RecoveryResponse> => {
+  return fetch(`${process.env.REACT_APP_API_URL}/api/auth/recovery?emailAddress=${emailAddress}`, {
+    method: "POST",
+  }).then((resp) => {
+    switch (resp.status) {
+      case 200:
+        return {
+          message: "An email has been sent for recovery",
+          responseType: "success",
+        } as RecoveryResponse
+      default:
+        return {
+          message: "An unknown error has occured",
+          responseType: "error"
+        } as RecoveryResponse
+    }
+  });
+}
+
+export const verifyRecoveryCode = (recoveryCode: string, emailAddress: string): Promise<RecoveryResponseMessage> => {
+  return fetch(`${process.env.REACT_APP_API_URL}/api/auth/recovery-confirm?recoveryCode=${recoveryCode}&emailAddress=${emailAddress}`, {
+    method: "POST",
+  }).then(async (resp) => {
+    switch (resp.status) {
+      case 200:
+        const response: RecoveryResponseMessage = await resp.json();
+
+        return {
+          recoveryCodeAuthenticationCode: response.recoveryCodeAuthenticationCode,
+          message: "Successfully verified recovery code",
+          responseType: "success"
+        } as RecoveryResponseMessage
+      default:
+        return {
+          recoveryCodeAuthenticationCode: "",
+          message: "An unknown error has occured",
+          responseType: "error"
+        } as RecoveryResponseMessage
+    }
+  });
+}
+
+export const resetPassword = (authCode: string, emailAddress: string, newPassword: string): Promise<ResetPasswordResponse> => {
+  return fetch(`${process.env.REACT_APP_API_URL}/api/auth/password-reset?authCode=${authCode}&emailAddress=${emailAddress}`, {
+    method: "POST",
+    body: JSON.stringify({
+      newPassword: newPassword,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    }
+  }).then(async (resp) => {
+    switch (resp.status) {
+      case 200:
+        return {
+          responseMessage: "Password has been reset",
+          responseType: "success"
+        } as ResetPasswordResponse
+      default:
+        return {
+          responseMessage: "An unknown error has occured.",
+          responseType: "error"
+        } as ResetPasswordResponse
+    }
+  });
+}
+
+export const removeFundraiserImages = (fundraiserID: string): Promise<RemoveFundraiserImagesResponse> => {
+  const authorization = localStorage.getItem("accessToken");
+
+  return fetch(`${process.env.REACT_APP_API_URL}/api/fundraiser/remove-images?fundraiserID=${fundraiserID}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Bearer " + (authorization || ""),
+    },
+  }).then((resp) => {
+    switch (resp.status) {
+      case 200:
+        return {
+          responseMessage: "Uploading images...",
+          responseType: "success"
+        } as RemoveFundraiserImagesResponse
+      default:
+        return {
+          responseMessage: "An unknown error has occured.",
+          responseType: "error"
+        } as RemoveFundraiserImagesResponse
+    }
+  })
 }

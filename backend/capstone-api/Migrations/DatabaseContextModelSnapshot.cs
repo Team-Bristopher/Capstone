@@ -113,6 +113,29 @@ namespace capstoneapi.Migrations
                     b.ToTable("FundraiserAdmins", "Capstone");
                 });
 
+            modelBuilder.Entity("capstone_api.Models.DatabaseEntities.FundraiserImages", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FundraiserID")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FundraiserImageURL")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("FundraiserID");
+
+                    b.ToTable("FundraiserImages", "Capstone");
+                });
+
             modelBuilder.Entity("capstone_api.Models.DatabaseEntities.FundraiserType", b =>
                 {
                     b.Property<Guid>("ID")
@@ -171,6 +194,11 @@ namespace capstoneapi.Migrations
                         {
                             ID = new Guid("64d3f6df-5597-4856-9627-e72aadd323e9"),
                             Type = 8
+                        },
+                        new
+                        {
+                            ID = new Guid("a577a3a2-2048-4010-9f21-23410e5e0065"),
+                            Type = 9
                         });
                 });
 
@@ -208,6 +236,38 @@ namespace capstoneapi.Migrations
                     b.ToTable("GlobalAdmins", "Capstone");
                 });
 
+            modelBuilder.Entity("capstone_api.Models.DatabaseEntities.RecoveryCodes", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Code")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsComplete")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RecoveryAuthenticationCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RequestedFor")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("RequestedFor");
+
+                    b.ToTable("RecoveryCodes", "Capstone");
+                });
+
             modelBuilder.Entity("capstone_api.Models.DatabaseEntities.User", b =>
                 {
                     b.Property<Guid>("ID")
@@ -234,6 +294,10 @@ namespace capstoneapi.Migrations
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
 
+                    b.Property<string>("ProfilePictureURL")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("ID");
 
                     b.ToTable("Users", "Capstone");
@@ -245,7 +309,8 @@ namespace capstoneapi.Migrations
                             EmailAddress = "anonymous@user.org",
                             FirstName = "Anonymous",
                             LastName = "User",
-                            Password = "SuperSecretPassw0rd!"
+                            Password = "SuperSecretPassw0rd!",
+                            ProfilePictureURL = ""
                         });
                 });
 
@@ -306,6 +371,17 @@ namespace capstoneapi.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("capstone_api.Models.DatabaseEntities.FundraiserImages", b =>
+                {
+                    b.HasOne("capstone_api.Models.DatabaseEntities.Fundraiser", "Fundraiser")
+                        .WithMany("FundraiserImages")
+                        .HasForeignKey("FundraiserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Fundraiser");
+                });
+
             modelBuilder.Entity("capstone_api.Models.DatabaseEntities.FundraiserView", b =>
                 {
                     b.HasOne("capstone_api.Models.DatabaseEntities.Fundraiser", "ViewedFundraiser")
@@ -336,11 +412,24 @@ namespace capstoneapi.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("capstone_api.Models.DatabaseEntities.RecoveryCodes", b =>
+                {
+                    b.HasOne("capstone_api.Models.DatabaseEntities.User", "RequestedForUser")
+                        .WithMany()
+                        .HasForeignKey("RequestedFor")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RequestedForUser");
+                });
+
             modelBuilder.Entity("capstone_api.Models.DatabaseEntities.Fundraiser", b =>
                 {
                     b.Navigation("Admins");
 
                     b.Navigation("Donations");
+
+                    b.Navigation("FundraiserImages");
 
                     b.Navigation("Views");
                 });

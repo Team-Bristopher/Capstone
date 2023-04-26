@@ -1,4 +1,4 @@
-import { Box, Button as ChakraButton, Container, Link, Popover, PopoverContent, PopoverTrigger, Text } from "@chakra-ui/react";
+import { Avatar, Box, Button as ChakraButton, Container, Link, Popover, PopoverContent, PopoverTrigger, Text } from "@chakra-ui/react";
 import { FunctionComponent, useContext } from "react";
 import { MdSettings } from "react-icons/md";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
@@ -137,17 +137,28 @@ export const Navbar: FunctionComponent = () => {
                   >
                     <PopoverTrigger>
                       <div>
-                        <Button
-                          variant="icon_button"
-                          ariaLabel="Settings"
-                          icon={MdSettings}
-                          style={{
-                            width: "1em",
-                          }}
-                        />
+                        {(authContext.loggedInUser.profilePictureURL !== "") ? (
+                          <Avatar
+                            size="sm"
+                            src={authContext.loggedInUser.profilePictureURL}
+                            _hover={{
+                              cursor: "pointer",
+                            }}
+                            aria-label="Profile-Icon"
+                          />
+                        ) : (
+                          <Button
+                            variant="icon_button"
+                            ariaLabel="Settings"
+                            icon={MdSettings}
+                            style={{
+                              width: "1em",
+                            }}
+                            aria-label="Profile-Icon"
+                          />
+                        )}
                       </div>
                     </PopoverTrigger>
-
                     <PopoverContent
                       zIndex="1000"
                       padding="1em"

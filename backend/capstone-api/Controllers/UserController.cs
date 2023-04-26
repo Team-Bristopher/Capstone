@@ -12,7 +12,7 @@ namespace capstone_api.Controllers
     [Route("api/user")]
     [ApiController]
     public class UserController : ControllerBase
-	{
+    {
         private readonly IUsersBusinessLogic _usersBusinessLogic;
 
         /// <summary>
@@ -20,9 +20,9 @@ namespace capstone_api.Controllers
         /// </summary>
         public UserController(
             IUsersBusinessLogic usersBusinessLogic)
-		{
+        {
             _usersBusinessLogic = usersBusinessLogic;
-		}
+        }
 
         /// <summary>
         /// Edits a user.
@@ -43,6 +43,16 @@ namespace capstone_api.Controllers
 
             return Ok();
         }
-	}
+
+        [HttpPost("image-upload")]
+        [Authorize(Policy = "RegisteredUser")]
+        public async Task<IActionResult> UploadImage(
+            [FromForm] IFormFile file)
+        {
+            await _usersBusinessLogic.UploadProfileImage(file);
+
+            return Ok();
+        }
+    }
 }
 
