@@ -37,10 +37,3 @@ export const printCodeCoverage = (results: Array<JSCoverageResults>) => {
       });
    });
 }
-
-export const getMockUserCreds = (): [string, string] => {
-   return [
-      'abbasr723868@gmail.com',
-      'Jul17200123%'
-   ]
-}
